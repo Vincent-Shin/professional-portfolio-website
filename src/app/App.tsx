@@ -5,6 +5,7 @@ import {
   Linkedin,
   Mail,
   MapPin,
+  PanelLeft,
   MessageCircle,
   Moon,
   Sparkles,
@@ -620,6 +621,17 @@ type ChatMessage = {
   content: string;
 };
 
+type ChatReplyResult = {
+  reply: string;
+  source: "api" | "fallback";
+};
+
+type PortfolioChatContext = {
+  section: string;
+  resumeLabel: string;
+  selectedProject: string;
+};
+
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
@@ -884,14 +896,30 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
     : "I can help with project summaries, backend fit, machine learning experience, availability, resume targeting, or contact information. Try asking which project best matches backend roles or how to contact Vincent.";
 }
 
-async function requestPortfolioAssistantReply(message: string, isDark: boolean, history: ChatMessage[]) {
+const getPortfolioApiBase = () => {
+  const configuredEndpoint = typeof import.meta.env.VITE_PORTFOLIO_CHAT_API_URL === "string" ? import.meta.env.VITE_PORTFOLIO_CHAT_API_URL.trim() : "";
+  if (configuredEndpoint) {
+    return configuredEndpoint.replace(/\/api\/chat\/?$/, "");
+  }
+  if (typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+    return "";
+  }
+  return "";
+};
+
+async function requestPortfolioAssistantReply(
+  message: string,
+  isDark: boolean,
+  history: ChatMessage[],
+  context: PortfolioChatContext,
+): Promise<ChatReplyResult> {
   const configuredEndpoint = typeof import.meta.env.VITE_PORTFOLIO_CHAT_API_URL === "string" ? import.meta.env.VITE_PORTFOLIO_CHAT_API_URL.trim() : "";
   const endpoint =
     configuredEndpoint ||
     (typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname) ? "/api/chat" : "");
 
   if (!endpoint) {
-    return getPortfolioAssistantReply(message, isDark);
+    return { reply: getPortfolioAssistantReply(message, isDark), source: "fallback" };
   }
 
   try {
@@ -904,6 +932,9 @@ async function requestPortfolioAssistantReply(message: string, isDark: boolean, 
         message,
         theme: isDark ? "dark" : "light",
         history: history.slice(-8).map((item) => ({ role: item.role, content: item.content })),
+        section: context.section,
+        resumeLabel: context.resumeLabel,
+        selectedProject: context.selectedProject,
       }),
     });
 
@@ -912,9 +943,12 @@ async function requestPortfolioAssistantReply(message: string, isDark: boolean, 
     }
 
     const data = (await response.json()) as { reply?: string };
-    return typeof data.reply === "string" && data.reply.trim() ? data.reply.trim() : getPortfolioAssistantReply(message, isDark);
+    return {
+      reply: typeof data.reply === "string" && data.reply.trim() ? data.reply.trim() : getPortfolioAssistantReply(message, isDark),
+      source: "api",
+    };
   } catch {
-    return getPortfolioAssistantReply(message, isDark);
+    return { reply: getPortfolioAssistantReply(message, isDark), source: "fallback" };
   }
 }
 
@@ -926,21 +960,33 @@ export default function App() {
   const [theme, setTheme] = useState("light");
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
+  const [mobileProfileOpen, setMobileProfileOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("about");
   const [chatDraft, setChatDraft] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatPending, setChatPending] = useState(false);
+  const [chatMode, setChatMode] = useState<"api" | "fallback" | "local">("local");
   const audioContextRef = useRef<AudioContext | null>(null);
   const previousThemeRef = useRef<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const sessionIdRef = useRef("");
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("portfolio-theme");
     const savedSound = window.localStorage.getItem("portfolio-sound");
+    const savedSessionId = window.localStorage.getItem("portfolio-session-id");
     if (savedTheme === "light" || savedTheme === "dark") {
       setTheme(savedTheme);
     }
     if (savedSound === "on" || savedSound === "off") {
       setSoundEnabled(savedSound === "on");
+    }
+    if (savedSessionId) {
+      sessionIdRef.current = savedSessionId;
+    } else {
+      const nextSessionId = window.crypto?.randomUUID?.() ?? `session-${Date.now()}`;
+      sessionIdRef.current = nextSessionId;
+      window.localStorage.setItem("portfolio-session-id", nextSessionId);
     }
   }, []);
 
@@ -1158,6 +1204,82 @@ export default function App() {
   }, [chatMessages, chatOpen, chatPending]);
 
   useEffect(() => {
+    if (!mobileProfileOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileProfileOpen]);
+
+  useEffect(() => {
+    const sections = Array.from(document.querySelectorAll<HTMLElement>("section[id]"));
+    if (!sections.length) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+        if (visibleEntries[0]?.target?.id) {
+          setActiveSection(visibleEntries[0].target.id);
+        }
+      },
+      {
+        rootMargin: "-20% 0px -45% 0px",
+        threshold: [0.2, 0.35, 0.5, 0.7],
+      },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
+  const trackPortfolioEvent = async (eventType: string, data: Record<string, unknown> = {}) => {
+    const apiBase = getPortfolioApiBase();
+    const endpoint = `${apiBase}/api/track`;
+    const payload = {
+      eventType,
+      sessionId: sessionIdRef.current || "anonymous",
+      referrer: typeof document !== "undefined" ? document.referrer : "",
+      pageUrl: typeof window !== "undefined" ? window.location.href : "",
+      theme: isDark ? "dark" : "light",
+      ...data,
+    };
+
+    try {
+      if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+        const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+        navigator.sendBeacon(endpoint, blob);
+        return;
+      }
+
+      await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": sessionIdRef.current || "anonymous",
+        },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      });
+    } catch {
+      // Best-effort telemetry only.
+    }
+  };
+
+  const handleTrackedExternalClick = (label: string, url: string, frequency = 560) => {
+    void trackPortfolioEvent("link_click", { label, linkClicked: url });
+    playUiTick(frequency, true);
+  };
+
+  useEffect(() => {
     if (previousThemeRef.current === null) {
       previousThemeRef.current = theme;
       return;
@@ -1198,11 +1320,18 @@ export default function App() {
     playUiTick(600, true);
     setChatPending(true);
 
-    const assistantReply = await requestPortfolioAssistantReply(message, isDark, [...chatMessages, userMessage]);
+    const assistantReply = await requestPortfolioAssistantReply(message, isDark, [...chatMessages, userMessage], chatContext);
+    setChatMode(assistantReply.source);
+    if (assistantReply.source === "fallback") {
+      void trackPortfolioEvent("fallback_question", {
+        question: message,
+        historyLength: chatMessages.length,
+      });
+    }
 
     setChatMessages((messages) => [
       ...messages,
-      { id: `assistant-${timestamp}`, role: "assistant", content: assistantReply },
+      { id: `assistant-${timestamp}`, role: "assistant", content: assistantReply.reply },
     ]);
     setChatPending(false);
   };
@@ -1210,6 +1339,11 @@ export default function App() {
   const chatQuickPrompts = isDark
     ? ["Is he available to work right now?", "Which projects best fit backend roles?", "How can I contact him?"]
     : ["Is he available to work right now?", "Which project is strongest for backend roles?", "Can you summarize his ML experience?"];
+  const chatContext = {
+    section: activeSection,
+    resumeLabel: currentResumeView.label,
+    selectedProject: selectedProject.title,
+  };
 
   return (
     <div className={cx("min-h-screen transition-colors duration-500", shellClass)}>
@@ -1352,6 +1486,30 @@ export default function App() {
           <a href="#about" onClick={() => playUiTick(540)} className={cx("text-[15px] uppercase tracking-[0.28em]", isDark ? "text-white" : "text-[#111111]")}>
             Trung Tuan Mai
           </a>
+          <div className="flex items-center gap-2 md:hidden">
+            <button
+              type="button"
+              onClick={() => {
+                playUiTick(560, true);
+                setMobileProfileOpen(true);
+              }}
+              className={cx("inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm transition-colors", railButtonClass)}
+            >
+              <PanelLeft className="h-4 w-4" />
+              Profile
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                playUiTick(610, true);
+                setChatOpen((open) => !open);
+              }}
+              className={cx("inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm transition-colors", railButtonClass)}
+            >
+              <MessageCircle className="h-4 w-4" />
+              Chat
+            </button>
+          </div>
           <div className="hidden items-center gap-6 md:flex">
             <div className={cx("flex gap-6 text-sm", isDark ? "text-white/60" : "text-black/60")}>
               {navItems.map((item) => (
@@ -1716,7 +1874,7 @@ export default function App() {
                         </div>
                         <div className="min-w-0">
                           <p className={cx("text-xs uppercase tracking-[0.24em]", softTextClass)}>Email</p>
-                          <a href="mailto:trungtuan.mai@ucalgary.ca" onClick={() => playUiTick(560)} className="mt-2 block break-all text-[1.08rem] leading-7 hover:underline">
+                          <a href="mailto:trungtuan.mai@ucalgary.ca" onClick={() => handleTrackedExternalClick("email", "mailto:trungtuan.mai@ucalgary.ca")} className="mt-2 block break-all text-[1.08rem] leading-7 hover:underline">
                             trungtuan.mai@ucalgary.ca
                           </a>
                         </div>
@@ -1739,7 +1897,7 @@ export default function App() {
                         </div>
                         <div className="min-w-0">
                           <p className={cx("text-xs uppercase tracking-[0.24em]", softTextClass)}>LinkedIn</p>
-                          <a href="https://linkedin.com/in/tuanmai3011" target="_blank" rel="noreferrer" onClick={() => playUiTick(560)} className="mt-2 block break-all text-[1.08rem] leading-7 hover:underline">
+                          <a href="https://linkedin.com/in/tuanmai3011" target="_blank" rel="noreferrer" onClick={() => handleTrackedExternalClick("linkedin", "https://linkedin.com/in/tuanmai3011")} className="mt-2 block break-all text-[1.08rem] leading-7 hover:underline">
                             linkedin.com/in/tuanmai3011
                           </a>
                         </div>
@@ -1750,7 +1908,7 @@ export default function App() {
                         </div>
                         <div>
                           <p className={cx("text-xs uppercase tracking-[0.24em]", softTextClass)}>GitHub</p>
-                          <a href="https://github.com/Vincent-Shin" target="_blank" rel="noreferrer" onClick={() => playUiTick(560)} className="mt-2 block text-lg hover:underline">github.com/Vincent-Shin</a>
+                          <a href="https://github.com/Vincent-Shin" target="_blank" rel="noreferrer" onClick={() => handleTrackedExternalClick("github", "https://github.com/Vincent-Shin")} className="mt-2 block text-lg hover:underline">github.com/Vincent-Shin</a>
                         </div>
                       </div>
                     </div>
@@ -1762,7 +1920,7 @@ export default function App() {
                         </div>
                         <div>
                           <p className={cx("text-xs uppercase tracking-[0.24em]", softTextClass)}>Instagram</p>
-                          <a href="https://www.instagram.com/chu.be.dan3011/" target="_blank" rel="noreferrer" onClick={() => playUiTick(560)} className="mt-2 block text-lg hover:underline">
+                          <a href="https://www.instagram.com/chu.be.dan3011/" target="_blank" rel="noreferrer" onClick={() => handleTrackedExternalClick("instagram", "https://www.instagram.com/chu.be.dan3011/")} className="mt-2 block text-lg hover:underline">
                             instagram.com/chu.be.dan3011
                           </a>
                         </div>
@@ -1773,7 +1931,7 @@ export default function App() {
                         </div>
                         <div>
                           <p className={cx("text-xs uppercase tracking-[0.24em]", softTextClass)}>Facebook</p>
-                          <a href="https://www.facebook.com/tuan.mai.545285" target="_blank" rel="noreferrer" onClick={() => playUiTick(560)} className="mt-2 block text-lg hover:underline">
+                          <a href="https://www.facebook.com/tuan.mai.545285" target="_blank" rel="noreferrer" onClick={() => handleTrackedExternalClick("facebook", "https://www.facebook.com/tuan.mai.545285")} className="mt-2 block text-lg hover:underline">
                             facebook.com/tuan.mai.545285
                           </a>
                         </div>
@@ -1827,7 +1985,7 @@ export default function App() {
                       </div>
                       <div className="min-w-0">
                         <p className={cx("text-xs uppercase tracking-[0.24em]", softTextClass)}>Email</p>
-                        <a href="mailto:trungtuan.mai@ucalgary.ca" onClick={() => playUiTick(560)} className="mt-2 block text-[1rem] leading-7 hover:underline">
+                          <a href="mailto:trungtuan.mai@ucalgary.ca" onClick={() => handleTrackedExternalClick("email", "mailto:trungtuan.mai@ucalgary.ca")} className="mt-2 block text-[1rem] leading-7 hover:underline">
                           trungtuan.mai@ucalgary.ca
                         </a>
                       </div>
@@ -1839,7 +1997,7 @@ export default function App() {
                       </div>
                       <div className="min-w-0">
                         <p className={cx("text-xs uppercase tracking-[0.24em]", softTextClass)}>LinkedIn</p>
-                        <a href="https://linkedin.com/in/tuanmai3011" target="_blank" rel="noreferrer" onClick={() => playUiTick(560)} className="mt-2 block whitespace-nowrap text-[0.98rem] leading-7 hover:underline">
+                        <a href="https://linkedin.com/in/tuanmai3011" target="_blank" rel="noreferrer" onClick={() => handleTrackedExternalClick("linkedin", "https://linkedin.com/in/tuanmai3011")} className="mt-2 block whitespace-nowrap text-[0.98rem] leading-7 hover:underline">
                           linkedin.com/in/tuanmai3011
                         </a>
                       </div>
@@ -1861,7 +2019,7 @@ export default function App() {
                       </div>
                       <div className="min-w-0">
                         <p className={cx("text-xs uppercase tracking-[0.24em]", softTextClass)}>GitHub</p>
-                        <a href="https://github.com/Vincent-Shin" target="_blank" rel="noreferrer" onClick={() => playUiTick(560)} className="mt-2 block whitespace-nowrap text-[1rem] leading-7 hover:underline">
+                        <a href="https://github.com/Vincent-Shin" target="_blank" rel="noreferrer" onClick={() => handleTrackedExternalClick("github", "https://github.com/Vincent-Shin")} className="mt-2 block whitespace-nowrap text-[1rem] leading-7 hover:underline">
                           github.com/Vincent-Shin
                         </a>
                       </div>
@@ -2008,17 +2166,17 @@ export default function App() {
                       <div className="mt-4 space-y-3">
                         <div className="flex flex-wrap gap-3">
                           {selectedProjectDetail.projectUrl && (
-                            <a href={selectedProjectDetail.projectUrl} target="_blank" rel="noreferrer" className={cx("inline-flex rounded-full border px-4 py-2 text-sm transition-colors", actionClass)}>
+                            <a href={selectedProjectDetail.projectUrl} target="_blank" rel="noreferrer" onClick={() => handleTrackedExternalClick(selectedProjectDetail.projectUrlLabel, selectedProjectDetail.projectUrl, 545)} className={cx("inline-flex rounded-full border px-4 py-2 text-sm transition-colors", actionClass)}>
                               {selectedProjectDetail.projectUrlLabel}
                             </a>
                           )}
                           {selectedProjectDetail.certificateUrl && (
-                            <a href={selectedProjectDetail.certificateUrl} target="_blank" rel="noreferrer" className={cx("inline-flex rounded-full border px-4 py-2 text-sm transition-colors", actionClass)}>
+                            <a href={selectedProjectDetail.certificateUrl} target="_blank" rel="noreferrer" onClick={() => handleTrackedExternalClick(selectedProjectDetail.certificateUrlLabel, selectedProjectDetail.certificateUrl, 545)} className={cx("inline-flex rounded-full border px-4 py-2 text-sm transition-colors", actionClass)}>
                               {selectedProjectDetail.certificateUrlLabel}
                             </a>
                           )}
                           {selectedProjectDetail.liveUrl && (
-                            <a href={selectedProjectDetail.liveUrl} target="_blank" rel="noreferrer" className={cx("inline-flex rounded-full border px-4 py-2 text-sm transition-colors", actionClass)}>
+                            <a href={selectedProjectDetail.liveUrl} target="_blank" rel="noreferrer" onClick={() => handleTrackedExternalClick(selectedProjectDetail.liveUrlLabel, selectedProjectDetail.liveUrl, 545)} className={cx("inline-flex rounded-full border px-4 py-2 text-sm transition-colors", actionClass)}>
                               {selectedProjectDetail.liveUrlLabel}
                             </a>
                           )}
@@ -2053,6 +2211,107 @@ export default function App() {
           </div>
         </div>
       )}
+      {mobileProfileOpen && (
+        <div className="fixed inset-0 z-[85] md:hidden">
+          <div className="absolute inset-0 bg-black/45 backdrop-blur-sm" onClick={() => setMobileProfileOpen(false)} />
+          <div className={cx("absolute inset-x-3 bottom-3 top-20 flex flex-col overflow-hidden rounded-[28px] border p-4 shadow-[0_30px_90px_rgba(0,0,0,0.28)] transition-all duration-200", sidebarClass)}>
+            <div className="flex items-center justify-between gap-3 border-b pb-3">
+              <div>
+                <p className={cx("text-[10px] uppercase tracking-[0.28em]", softTextClass)}>Mobile Profile</p>
+                <h3 className="mt-1 text-[1.2rem] tracking-[-0.04em]">{isDark ? "Vincent Mai" : "Trung Tuan Mai"}</h3>
+              </div>
+              <button type="button" onClick={() => setMobileProfileOpen(false)} className={cx("rounded-full border p-2 transition-colors", railButtonClass)}>
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pt-4">
+              <p className={cx("text-sm leading-6", mutedTextClass)}>
+                {isDark
+                  ? "Final-year builder into backend systems, data-heavy work, and turning ideas into something real."
+                  : "Final-year Software Engineering student building backend systems, data workflows, and practical machine learning projects."}
+              </p>
+
+              <div className={cx("rounded-[18px] border px-4 py-3", isDark ? "border-cyan-300/26 bg-[linear-gradient(180deg,rgba(34,211,238,0.09),rgba(17,24,39,0.28))]" : "border-[#d8c8ad] bg-[linear-gradient(180deg,#f8f3ea,#f2e9db)]")}>
+                <div className="flex items-center gap-3">
+                  <span className={cx("inline-flex h-2.5 w-2.5 rounded-full", isDark ? "bg-cyan-300 shadow-[0_0_0_6px_rgba(34,211,238,0.16)]" : "bg-[#9a7740] shadow-[0_0_0_6px_rgba(154,119,64,0.10)]")} />
+                  <p className={cx("text-[10px] font-medium uppercase tracking-[0.3em]", isDark ? "text-cyan-100/92" : "text-[#8a6d3d]")}>{isDark ? "Profile Note" : "Professional Profile"}</p>
+                </div>
+                <p className={cx("mt-2.5 text-[13px] leading-6", isDark ? "text-cyan-50/88" : "text-black/74")}>
+                  {isDark
+                    ? "Calm, collaborative, and strongest when the work is technical, useful, and grounded in real execution."
+                    : "Open to meaningful engineering opportunities where I can contribute early, learn quickly, and grow with a strong team."}
+                </p>
+              </div>
+
+              {sidebarRows.map((row) => (
+                <div key={`mobile-${row.label}`} className={cx("rounded-[17px] border px-4 py-3", softSurfaceClass)}>
+                  <p className={cx("text-[10px] uppercase tracking-[0.28em]", softTextClass)}>{row.label}</p>
+                  <p className={cx("mt-2 text-[13px] leading-6", mutedTextClass)}>{row.value}</p>
+                </div>
+              ))}
+
+              <div className={cx("rounded-[17px] border px-4 py-3", softSurfaceClass)}>
+                <p className={cx("text-[10px] uppercase tracking-[0.28em]", softTextClass)}>Current Focus</p>
+                <div className="mt-2 space-y-2">
+                  {currentFocusItems.map((item) => (
+                    <div key={`mobile-focus-${item}`} className={cx("rounded-[13px] border px-3 py-2 text-[13px] leading-6", isDark ? "border-white/8 bg-white/[0.03]" : "border-black/8 bg-black/[0.02]", mutedTextClass)}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className={cx("rounded-[17px] border px-4 py-3", softSurfaceClass)}>
+                <p className={cx("text-[10px] uppercase tracking-[0.28em]", softTextClass)}>In Progress Projects</p>
+                <div className="mt-2 space-y-2">
+                  {inProgressProjects.map((project) => (
+                    <div key={`mobile-progress-${project}`} className={cx("rounded-[13px] border px-3 py-2 text-[13px] leading-6", isDark ? "border-white/8 bg-white/[0.03]" : "border-black/8 bg-black/[0.02]", mutedTextClass)}>
+                      {project}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className={cx("rounded-[17px] border px-4 py-3", softSurfaceClass)}>
+                <p className={cx("text-[10px] uppercase tracking-[0.28em]", softTextClass)}>Exploration Areas</p>
+                <div className="mt-2 space-y-2">
+                  {explorationAreas.map((item) => (
+                    <div key={`mobile-explore-${item}`} className={cx("rounded-[13px] border px-3 py-2 text-[13px] leading-6", isDark ? "border-white/8 bg-white/[0.03]" : "border-black/8 bg-black/[0.02]", mutedTextClass)}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2.5 border-t pt-4">
+              <button type="button" onClick={handleThemeToggle} className={cx("inline-flex h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors", railButtonClass)}>
+                {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+                {isDark ? "Light" : "Dark"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playUiTick(610, true);
+                  setChatOpen(true);
+                  setMobileProfileOpen(false);
+                }}
+                className={cx("inline-flex h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors", railButtonClass)}
+              >
+                <MessageCircle className="h-3.5 w-3.5" />
+                Chatbot
+              </button>
+              {isDark && (
+                <button type="button" onClick={handleSoundToggle} className={cx("inline-flex h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors", railButtonClass)}>
+                  {soundEnabled ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+                  Sound
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       <div className="fixed bottom-4 right-4 z-[80] sm:bottom-6 sm:right-6">
         {chatOpen && (
           <div className={cx("mb-3 flex h-[min(70vh,38rem)] w-[min(92vw,28rem)] flex-col rounded-[28px] border p-4 transition-colors duration-500", isDark ? "border-cyan-400/16 bg-[#111723]/96 text-white shadow-[0_30px_80px_rgba(0,0,0,0.4)]" : "border-black/10 bg-white/96 text-[#181818] shadow-[0_20px_60px_rgba(0,0,0,0.16)]")}>
@@ -2060,6 +2319,9 @@ export default function App() {
               <div>
                 <p className={cx("text-[11px] uppercase tracking-[0.24em]", softTextClass)}>{isDark ? "Vincent's Best Referral" : "Trung Tuan Mai Portfolio Assistant"}</p>
                 <p className="mt-1 text-sm">{isDark ? "Friendly, honest, and ready to vouch for him." : "Professional recruiter-facing assistant."}</p>
+                <p className={cx("mt-2 text-[11px] uppercase tracking-[0.24em]", chatMode === "api" ? (isDark ? "text-cyan-200/85" : "text-emerald-700") : softTextClass)}>
+                  {chatMode === "api" ? "Live AI" : "Fallback Local Assistant"}
+                </p>
               </div>
               <button type="button" onClick={() => setChatOpen(false)} className={cx("rounded-full border px-2 py-1 text-xs transition-colors", railButtonClass)}>
                 Close

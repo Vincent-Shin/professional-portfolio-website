@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import http from "node:http";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { buildSystemPrompt } from "./portfolio-context.mjs";
 
@@ -45,12 +46,18 @@ loadEnvFile(".env.local");
 const port = Number.parseInt(process.env.PORTFOLIO_CHAT_PORT ?? "8787", 10);
 const provider = (process.env.PORTFOLIO_CHAT_PROVIDER ?? "gemini").trim().toLowerCase();
 const allowedOrigin = (process.env.PORTFOLIO_CHAT_ALLOWED_ORIGIN ?? "*").trim();
+const analyticsDir = path.join(projectRoot, "server", "data");
+const analyticsLogPath = path.join(analyticsDir, "telemetry.jsonl");
 const jsonHeaders = {
   "Content-Type": "application/json; charset=utf-8",
   "Access-Control-Allow-Origin": allowedOrigin,
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Allow-Methods": "POST,OPTIONS",
 };
+
+if (!fs.existsSync(analyticsDir)) {
+  fs.mkdirSync(analyticsDir, { recursive: true });
+}
 
 function readJsonBody(req) {
   return new Promise((resolve, reject) => {
@@ -83,7 +90,45 @@ function normalizeHistory(history) {
     : [];
 }
 
-async function callGemini(message, theme, history) {
+function getRequestContext(req, body = {}) {
+  const sessionIdHeader = req.headers["x-session-id"];
+  const rawSessionId =
+    typeof body?.sessionId === "string"
+      ? body.sessionId
+      : typeof sessionIdHeader === "string"
+        ? sessionIdHeader
+        : Array.isArray(sessionIdHeader)
+          ? sessionIdHeader[0]
+          : "anonymous";
+
+  return {
+    country:
+      (typeof req.headers["cf-ipcountry"] === "string" && req.headers["cf-ipcountry"]) ||
+      (typeof body?.country === "string" && body.country) ||
+      "unknown",
+    referrer:
+      (typeof body?.referrer === "string" && body.referrer) ||
+      (typeof req.headers.referer === "string" && req.headers.referer) ||
+      "",
+    pageUrl: typeof body?.pageUrl === "string" ? body.pageUrl : "",
+    theme: body?.theme === "dark" ? "dark" : "light",
+    sessionHash: crypto.createHash("sha256").update(String(rawSessionId)).digest("hex"),
+  };
+}
+
+function appendTelemetry(entry) {
+  fs.appendFileSync(analyticsLogPath, `${JSON.stringify(entry)}\n`, "utf8");
+}
+
+function getPortfolioUiContext(body = {}) {
+  return {
+    section: typeof body?.section === "string" ? body.section : "unknown",
+    resumeLabel: typeof body?.resumeLabel === "string" ? body.resumeLabel : "unknown",
+    selectedProject: typeof body?.selectedProject === "string" ? body.selectedProject : "unknown",
+  };
+}
+
+async function callGemini(message, theme, history, context) {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) {
     throw new Error("Missing GEMINI_API_KEY");
@@ -95,7 +140,7 @@ async function callGemini(message, theme, history) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       systemInstruction: {
-        parts: [{ text: buildSystemPrompt(theme) }],
+        parts: [{ text: buildSystemPrompt(theme, context) }],
       },
       contents: [
         ...history.map((item) => ({
@@ -125,7 +170,7 @@ async function callGemini(message, theme, history) {
   return reply;
 }
 
-async function callOpenAI(message, theme, history) {
+async function callOpenAI(message, theme, history, context) {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) {
     throw new Error("Missing OPENAI_API_KEY");
@@ -143,7 +188,7 @@ async function callOpenAI(message, theme, history) {
       temperature: theme === "dark" ? 0.9 : 0.6,
       max_tokens: 320,
       messages: [
-        { role: "system", content: buildSystemPrompt(theme) },
+        { role: "system", content: buildSystemPrompt(theme, context) },
         ...history,
         { role: "user", content: message },
       ],
@@ -163,11 +208,11 @@ async function callOpenAI(message, theme, history) {
   return reply;
 }
 
-async function generateReply(message, theme, history) {
+async function generateReply(message, theme, history, context) {
   if (provider === "openai") {
-    return callOpenAI(message, theme, history);
+    return callOpenAI(message, theme, history, context);
   }
-  return callGemini(message, theme, history);
+  return callGemini(message, theme, history, context);
 }
 
 const server = http.createServer(async (req, res) => {
@@ -189,17 +234,47 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (req.method === "POST" && req.url === "/api/track") {
+    try {
+      const body = await readJsonBody(req);
+      const context = getRequestContext(req, body);
+      appendTelemetry({
+        eventType: typeof body?.eventType === "string" ? body.eventType : "unknown_event",
+        timestamp: new Date().toISOString(),
+        country: context.country,
+        referrer: context.referrer,
+        pageUrl: context.pageUrl,
+        theme: context.theme,
+        sessionHash: context.sessionHash,
+        linkClicked: typeof body?.linkClicked === "string" ? body.linkClicked : null,
+        label: typeof body?.label === "string" ? body.label : null,
+        question: typeof body?.question === "string" ? body.question : null,
+        historyLength: typeof body?.historyLength === "number" ? body.historyLength : null,
+      });
+      res.writeHead(202, jsonHeaders);
+      res.end(JSON.stringify({ ok: true }));
+      return;
+    } catch (error) {
+      res.writeHead(400, jsonHeaders);
+      res.end(JSON.stringify({ error: error instanceof Error ? error.message : "Tracking error" }));
+      return;
+    }
+  }
+
   if (req.method !== "POST" || req.url !== "/api/chat") {
     res.writeHead(404, jsonHeaders);
     res.end(JSON.stringify({ error: "Not found" }));
     return;
   }
 
+  let body = {};
+
   try {
-    const body = await readJsonBody(req);
+    body = await readJsonBody(req);
     const message = typeof body?.message === "string" ? body.message.trim() : "";
     const theme = body?.theme === "dark" ? "dark" : "light";
     const history = normalizeHistory(body?.history);
+    const uiContext = getPortfolioUiContext(body);
 
     if (!message) {
       res.writeHead(400, jsonHeaders);
@@ -207,12 +282,31 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const reply = await generateReply(message, theme, history);
+    const reply = await generateReply(message, theme, history, uiContext);
     res.writeHead(200, jsonHeaders);
     res.end(JSON.stringify({ reply }));
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown chat error";
     const statusCode = message.startsWith("Missing ") ? 503 : 500;
+    try {
+      const context = getRequestContext(req, body);
+      appendTelemetry({
+        eventType: "fallback_question",
+        timestamp: new Date().toISOString(),
+        country: context.country,
+        referrer: context.referrer,
+        pageUrl: context.pageUrl,
+        theme: context.theme,
+        sessionHash: context.sessionHash,
+        linkClicked: null,
+        label: "chat_fallback",
+        question: typeof body?.message === "string" ? body.message : null,
+        historyLength: Array.isArray(body?.history) ? body.history.length : null,
+        error: message,
+      });
+    } catch {
+      // Ignore telemetry failures on chat errors.
+    }
     res.writeHead(statusCode, jsonHeaders);
     res.end(JSON.stringify({ error: message }));
   }
