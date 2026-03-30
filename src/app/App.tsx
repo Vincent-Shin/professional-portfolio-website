@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+const assetPath = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
+
 const navItems = [
   { label: "About Me", href: "#about" },
   { label: "Resume", href: "#resume" },
@@ -26,12 +28,12 @@ const projectCards = [
   {
     id: "project-portfolio-website-system",
     title: "Professional Portfolio Website",
-    meta: "Frontend Product System | 2026",
+    meta: "Engineering Portfolio Platform | 2026",
     summary:
       "Recruiter-focused portfolio website with dual-mode presentation, resume targeting, project storytelling, and polished modal navigation.",
     stack: ["React", "TypeScript", "Vite", "Tailwind CSS", "UI Writing"],
     imageLabel: "Frontend / Portfolio System",
-    imageSrc: "/project-visuals/01-portfolio.png",
+    imageSrc: assetPath("/project-visuals/01-portfolio.png"),
   },
   {
     id: "project-car-sales-revenue",
@@ -41,7 +43,7 @@ const projectCards = [
       "Revenue forecasting system built on 500,000+ records with reproducible preprocessing, feature engineering, and regression benchmarking.",
     stack: ["Python", "pandas", "NumPy", "scikit-learn", "joblib"],
     imageLabel: "ML / Revenue Forecasting",
-    imageSrc: "/project-visuals/02-car-sales.png",
+    imageSrc: assetPath("/project-visuals/02-car-sales.png"),
   },
   {
     id: "project-data-ingestion-backend-system",
@@ -51,7 +53,7 @@ const projectCards = [
       "Backend ingestion pipeline for restaurant menu and nutrition data with normalization, deduplication, enrichment, and API delivery.",
     stack: ["Python", "Flask", "MongoDB", "Docker", "PyMongo"],
     imageLabel: "Backend / ETL Pipeline",
-    imageSrc: "/project-visuals/04-data-ingestion.png",
+    imageSrc: assetPath("/project-visuals/04-data-ingestion.png"),
   },
   {
     id: "project-jp-morgan-chase-virtual-experience",
@@ -61,7 +63,7 @@ const projectCards = [
       "Spring Boot transaction-processing simulation with persistence, balance retrieval, and Kafka-based event-ingestion scaffolding.",
     stack: ["Java", "Spring Boot", "Spring Data JPA", "Kafka", "H2"],
     imageLabel: "Certificate / Finance Backend",
-    imageSrc: "/project-visuals/05-jpmorgan-certificate.png",
+    imageSrc: assetPath("/project-visuals/05-jpmorgan-certificate.png"),
   },
   {
     id: "project-backend-job-market-simulation-system",
@@ -71,7 +73,7 @@ const projectCards = [
       "Service-layer backend for a job-market simulation game with persistent player state, progression logic, and application outcomes.",
     stack: ["Python", "Flask", "SQLAlchemy", "SQLite", "REST API"],
     imageLabel: "Simulation / Game Backend",
-    imageSrc: "/project-visuals/03-job-market.png",
+    imageSrc: assetPath("/project-visuals/03-job-market.png"),
   },
   {
     id: "project-movie-ticket-reservation-system",
@@ -81,7 +83,7 @@ const projectCards = [
       "Java reservation platform with relational persistence, booking workflows, receipt generation, and cancellation rule enforcement.",
     stack: ["Java", "JDBC", "MySQL", "SQL", "Swing"],
     imageLabel: "Database / Reservation System",
-    imageSrc: "/project-visuals/movie-seatmap.jpg",
+    imageSrc: assetPath("/project-visuals/movie-seatmap.jpg"),
   },
   {
     id: "project-java-web-quality-engineering-system",
@@ -91,7 +93,7 @@ const projectCards = [
       "Multi-module Java web application emphasizing quality engineering through automated testing, CI/CD, migration tooling, and validation.",
     stack: ["Java", "Servlets", "Tomcat", "JUnit", "Jenkins"],
     imageLabel: "Quality Engineering / Web App",
-    imageSrc: "/project-visuals/06-java-web.png",
+    imageSrc: assetPath("/project-visuals/06-java-web.png"),
   },
   {
     id: "project-disaster-relief-management-system",
@@ -101,7 +103,7 @@ const projectCards = [
       "Java case-management model for disaster-relief records with domain entities, a database manager layer, and unit-tested object behavior.",
     stack: ["Java", "OOP", "JUnit", "JDBC", "Domain Modeling"],
     imageLabel: "Java / Relief Case Management",
-    imageSrc: "/project-visuals/09-disaster-relief.png",
+    imageSrc: assetPath("/project-visuals/09-disaster-relief.png"),
   },
   {
     id: "project-jfreechart-testing-project",
@@ -111,7 +113,7 @@ const projectCards = [
       "White-box test suite expansion for core JFreeChart utility classes covering boundary conditions, exceptions, and mock-based isolation.",
     stack: ["Java", "JUnit", "JMock", "White-box Testing"],
     imageLabel: "Testing / QA Engineering",
-    imageSrc: "/project-visuals/10-jfreechart.png",
+    imageSrc: assetPath("/project-visuals/10-jfreechart.png"),
   },
   {
     id: "project-embedded-systems-control-project",
@@ -121,7 +123,7 @@ const projectCards = [
       "Interrupt-driven embedded firmware integrating change notification interrupts, timer-based LED control, UART output, and idle-mode execution.",
     stack: ["Embedded C", "PIC24", "UART", "Timer Interrupts"],
     imageLabel: "Embedded / Firmware Control",
-    imageSrc: "/project-visuals/07-embedded.png",
+    imageSrc: assetPath("/project-visuals/07-embedded.png"),
   },
   {
     id: "project-calgary-hackathon-arena-system",
@@ -131,7 +133,7 @@ const projectCards = [
       "Godot-based arena and progression system with centralized game state, scene transitions, spawning logic, and meta-upgrade flow.",
     stack: ["Godot", "GDScript", "Game State", "Scene Systems"],
     imageLabel: "Hackathon / Game Systems",
-    imageSrc: "/project-visuals/08-calgary-hack.png",
+    imageSrc: assetPath("/project-visuals/08-calgary-hack.png"),
   },
 ];
 
@@ -140,10 +142,10 @@ const projectDetailsById = {
     background:
       "Built an end-to-end machine learning workflow for an upper-level machine learning course using a 500K+ row vehicle-sales dataset, with emphasis on data cleaning, reproducible preprocessing, regression benchmarking, and deployable model packaging.",
     bullets: [
-      "Parsed mixed raw sale-date strings, filled missing values by type, removed non-essential fields, and engineered sale-year, sale-month, weekday, and vehicle-age features.",
-      "Built a reusable scikit-learn preprocessing pipeline with StandardScaler, OneHotEncoder, and ColumnTransformer so training and inference followed the same transformations.",
-      "Benchmarked linear regression, decision tree, random forest, and gradient boosting models, then serialized the strongest pipeline with joblib after reaching an R-squared score of 0.91 on held-out data.",
-      "Used exploratory plots and correlation analysis to compare feature impact and support model-selection decisions with interpretable evaluation metrics such as RMSE, MAE, and MAPE.",
+      "Normalized heterogeneous sale-date fields, imputed nulls with dtype-specific strategies, dropped leakage-prone columns, and generated temporal plus vehicle-age features for the regression feature matrix.",
+      "Composed a scikit-learn preprocessing graph with ColumnTransformer, StandardScaler, and OneHotEncoder so categorical and numeric transforms were fit once and reused identically at inference time.",
+      "Benchmarked linear regression, decision tree, random forest, and gradient boosting regressors under a shared pipeline, then serialized the top-performing estimator with joblib after reaching R-squared = 0.91 on held-out data.",
+      "Instrumented model comparison with RMSE, MAE, MAPE, correlation analysis, and distribution plots to validate feature signal, residual behavior, and generalization quality.",
     ],
     frameworks: ["Python", "pandas", "NumPy", "scikit-learn", "ColumnTransformer", "StandardScaler", "OneHotEncoder", "matplotlib", "seaborn", "joblib"],
     projectUrl: "https://github.com/Vincent-Shin/ENSF444---Predicting-Car-Sales-Revenue.git",
@@ -153,10 +155,10 @@ const projectDetailsById = {
     background:
       "Built a backend-heavy ingestion platform for a web-based systems project that collects restaurant menu and nutrition data from multiple sources, normalizes records, enriches prices, and serves the data through a Flask API backed by MongoDB.",
     bullets: [
-      "Implemented API routes for health checks, full item retrieval, item upserts, and bulk price updates, with validation around required fields and malformed payloads.",
-      "Built unique-key generation and upsert logic so repeated ingestion runs could normalize restaurant, item, and portion records without duplicating documents.",
-      "Connected the backend to batch scrapers and seed scripts that ingest menu data, optional price data, and macro information across several restaurant sources.",
-      "Structured the workflow so schema initialization, seeding, scraper execution, and backend serving could be repeated consistently during milestone delivery and testing.",
+      "Implemented Flask REST endpoints for health checks, collection reads, document upserts, and bulk price mutation with request-shape validation and defensive handling for malformed payloads.",
+      "Used deterministic composite keys plus MongoDB upsert semantics to de-duplicate restaurant, item, and portion documents across repeated ingestion runs.",
+      "Integrated scraper and seed pipelines that parsed menu, pricing, and nutrition sources, then mapped raw records into a normalized backend schema before persistence.",
+      "Packaged schema initialization, seeding, scraper execution, and API serving into a repeatable backend workflow suitable for milestone demos, regression checks, and local redevelopment.",
     ],
     frameworks: ["Flask", "Flask-CORS", "MongoDB", "PyMongo", "Docker", "pdfplumber", "REST API", "Data Ingestion"],
     projectUrl: "https://csgit.ucalgary.ca/jashan.bhinder/seng513-202601-pg-17.git",
@@ -166,25 +168,25 @@ const projectDetailsById = {
     background:
       "Completed an enterprise-style backend simulation in the JP Morgan Chase Forage experience, focusing on Spring Boot service structure, persistence, REST access, and transaction-driven system design rather than a polished public-facing product.",
     bullets: [
-      "Implemented repository-backed balance lookup with Spring Data JPA and H2, returning account balances through a dedicated REST controller.",
-      "Structured the codebase around entities, repositories, controllers, and infrastructure components such as DatabaseConduit to mirror production-style Java backend layering.",
-      "Integrated Kafka listener scaffolding for transaction ingestion, reinforcing event-driven service concepts commonly used in financial systems.",
-      "Used the project to practice enterprise naming, package structure, and service decomposition patterns that are more production-oriented than a typical school assignment.",
+      "Implemented account-balance retrieval through Spring Data JPA repositories backed by H2, exposed via a dedicated REST controller and entity-driven persistence model.",
+      "Structured the service around entity, repository, controller, and infrastructure layers so request handling, persistence access, and database bootstrapping remained separated by responsibility.",
+      "Added Kafka consumer scaffolding for transaction ingestion to model an event-driven processing path instead of a purely synchronous request-response backend.",
+      "Followed production-style package boundaries, naming, and service decomposition patterns to mirror enterprise Java backend conventions more closely than a typical coursework submission.",
     ],
     frameworks: ["Spring Boot", "Spring Web", "Spring Data JPA", "Spring Kafka", "H2", "Maven", "REST Controller"],
     projectUrl: null,
     projectUrlLabel: "Certificate Available on Request",
-    certificateUrl: "/project-visuals/E6McHJDKsQYh79moz_Sj7temL583QAYpHXD_690295ec0ff91d19bfed78a1_1770692232407_completion_certificate.pdf",
+    certificateUrl: assetPath("/project-visuals/E6McHJDKsQYh79moz_Sj7temL583QAYpHXD_690295ec0ff91d19bfed78a1_1770692232407_completion_certificate.pdf"),
     certificateUrlLabel: "View Certificate PDF",
   },
   "project-backend-job-market-simulation-system": {
     background:
       "Built the backend architecture for a serious job-market simulation game in a software architecture course, centered on persistent progression, activity tracking, and rule-based hiring outcomes across multiple gameplay tiers.",
     bullets: [
-      "Modeled players and applications in a relational backend using Flask and SQLAlchemy, with SQLite for local development and PostgreSQL-compatible deployment support.",
-      "Designed REST APIs for player load-or-create, score updates, stage transitions, activity completion, run resets, application results, and leaderboard retrieval.",
-      "Implemented progression rules for startup, mid-tier, and big-tech outcomes, including score thresholds, activity requirements, and deterministic leaderboard behavior.",
-      "Deployed the playable frontend separately so the backend-backed simulation could be demonstrated as an end-to-end web experience rather than only as source code.",
+      "Modeled player state, applications, and progression history as SQLAlchemy entities with relational persistence on SQLite locally and PostgreSQL-compatible deployment targets.",
+      "Exposed backend state transitions through REST endpoints for player bootstrap, score mutation, stage advancement, activity completion, run reset, application resolution, and leaderboard reads.",
+      "Encoded hiring logic as deterministic progression rules driven by score thresholds, tier gates, and activity prerequisites rather than ad hoc frontend branching.",
+      "Connected the API to a separately deployed Unity WebGL client so backend persistence and game-state mutation could be exercised as an end-to-end system.",
     ],
     frameworks: ["Flask", "SQLAlchemy", "SQLite", "Supabase PostgreSQL", "Flask-CORS", "REST API", "Unity WebGL", "Firebase Hosting"],
     projectUrl: "https://github.com/Vincent-Shin/SENG401_PROJECT_GAME_L02_GROUP06",
@@ -196,10 +198,10 @@ const projectDetailsById = {
     background:
       "Built a database-backed Java reservation platform for a software design course that coordinated movie selection, theatre/showtime lookup, seat availability, payment capture, receipts, and cancellation rules across multiple entities.",
     bullets: [
-      "Connected Swing-based booking flows to JDBC persistence and a relational schema covering customers, theatres, showings, seat maps, seats, tickets, and receipts.",
-      "Implemented theatre, showtime, and seat-selection workflows, including payment entry fields and runtime checks against available inventory for each showing.",
-      "Supported business rules such as reserved-user early access, seat-ratio limits before public release, and cancellation logic tied to the project specification.",
-      "Used a desktop GUI flow to bridge object-oriented state, SQL-backed persistence, and customer-facing booking interactions within one cohesive Java application.",
+      "Bound Swing booking screens to JDBC-backed CRUD flows over a relational schema spanning customers, theatres, showings, seat maps, seats, tickets, payments, and receipts.",
+      "Implemented theatre, showtime, and seat-selection workflows with runtime availability checks and transactional updates against per-showing inventory.",
+      "Encoded specification-driven business rules including registered-user early access windows, seat-ratio release constraints, and cancellation eligibility checks.",
+      "Integrated GUI state, object-oriented domain logic, and SQL persistence into a single desktop workflow for booking, payment capture, receipt generation, and cancellation.",
     ],
     frameworks: ["Java Swing", "JDBC", "MySQL", "SQL", "Prepared Statements", "Object-Oriented Design"],
     projectUrl: "https://github.com/Vincent-Shin/ENSF480---Movie-Theatre-Ticket-Reservation-System.git",
@@ -209,10 +211,10 @@ const projectDetailsById = {
     background:
       "Worked within a Java web application for a quality engineering course, with the main learning goal centered on maintainable architecture, database-backed services, and broad automated validation across multiple testing layers.",
     bullets: [
-      "Used a servlet-based web layer on Tomcat with H2 persistence and Flyway migrations, reinforcing controlled schema evolution in a Java web stack.",
-      "Worked across unit, integration, API, BDD, and Selenium-based UI tests to strengthen release confidence and expose defects from several angles.",
-      "Practiced CI/CD and quality tooling through Jenkins, SonarQube, OWASP Dependency-Check, mutation testing, and performance-test workflows.",
-      "Learned to treat test automation and quality gates as core product concerns rather than add-ons, which made this project especially useful from a software engineering perspective.",
+      "Worked in a servlet-based Java web stack running on Tomcat with H2 persistence and Flyway-managed schema migrations for controlled database evolution.",
+      "Extended validation coverage across unit, integration, API, BDD, and Selenium UI layers so defects could be surfaced at multiple boundaries in the request and release pipeline.",
+      "Integrated Jenkins, SonarQube, OWASP Dependency-Check, mutation testing, and performance-test jobs as enforceable quality gates rather than optional post-development checks.",
+      "Treated automated testing, static analysis, and CI orchestration as first-class engineering concerns tied directly to release readiness and maintainability.",
     ],
     frameworks: ["Java", "Servlets", "Tomcat", "H2", "Flyway", "JUnit", "Selenium", "Cucumber", "Jenkins", "SonarQube", "OWASP Dependency-Check"],
     projectUrl: "https://github.com/xrrays/ENSF400-Group-Project.git",
@@ -222,10 +224,10 @@ const projectDetailsById = {
     background:
       "Built a Java object-oriented system for managing disaster-relief records, using domain entities, interface-based design, a basic database manager layer, and unit tests to model real-world case relationships.",
     bullets: [
-      "Implemented domain classes for disaster victims, inquirers, medical records, locations, family relations, dietary restrictions, supplies, and relief services.",
-      "Added a DatabaseManager layer with connection, storage, and retrieval methods to support persistence-oriented system thinking alongside the object model.",
-      "Wrote JUnit tests across the domain model to validate object behavior, interface contracts, and core record-management assumptions.",
-      "Organized the design around interfaces and strongly typed entities so the system could scale from academic modeling toward more realistic case-management workflows.",
+      "Implemented strongly typed domain entities for victims, inquirers, medical records, locations, family relationships, dietary restrictions, supplies, and relief services.",
+      "Added a DatabaseManager abstraction for connection handling, persistence, and retrieval so storage concerns were separated from core domain behavior.",
+      "Wrote JUnit coverage around entity behavior, interface contracts, and record-management invariants to validate the object model under expected and edge-case usage.",
+      "Organized the codebase around interfaces and domain boundaries to keep the model extensible for more realistic case-management workflows.",
     ],
     frameworks: ["Java", "OOP", "JUnit", "JDBC", "Interfaces", "MySQL", "Domain Modeling"],
     projectUrl: "https://github.com/Vincent-Shin/IA1-380.git",
@@ -235,9 +237,9 @@ const projectDetailsById = {
     background:
       "Completed several software testing labs around JFreeChart in a software testing, reliability, and quality course, focusing on white-box test design, boundary analysis, and defect-oriented validation of library utilities.",
     bullets: [
-      "Designed JUnit tests for core classes such as Range and DataUtilities across normal cases, null handling, invalid parameters, and edge-boundary behavior.",
-      "Used JMock in lab work to isolate dataset-facing behavior and verify library methods under tightly controlled mocked inputs.",
-      "Expanded assertion-heavy white-box test coverage to expose correctness issues in numerical utility logic rather than only demonstrating happy paths.",
+      "Designed JUnit test suites for Range and DataUtilities covering nominal behavior, null inputs, invalid parameters, and edge-boundary conditions.",
+      "Used JMock to isolate dataset-dependent logic so method behavior could be validated against controlled mocked collaborators instead of full object graphs.",
+      "Expanded white-box coverage with assertion-heavy defect-oriented cases aimed at exposing correctness faults in numerical utility paths, not just happy-path execution.",
     ],
     frameworks: ["JUnit", "JMock", "Eclipse", "White-box Testing"],
     projectUrl: null,
@@ -247,9 +249,9 @@ const projectDetailsById = {
     background:
       "Built interrupt-driven firmware on the PIC24F16KA101 for an embedded systems course, coordinating button input, timer-controlled LED behavior, UART diagnostics, and low-power execution on constrained hardware.",
     bullets: [
-      "Configured digital I/O, pull-ups, and change-notification interrupts so button events could drive state transitions without active polling.",
-      "Used Timer3 with multiple periods to map distinct pushbutton combinations to LED blink rates and steady-on states.",
-      "Integrated UART status messages and Idle-mode execution so the firmware stayed observable while preserving an interrupt-driven control loop.",
+      "Configured PIC24 digital I/O, internal pull-ups, and change-notification interrupts so button events triggered state transitions without polling loops.",
+      "Used Timer3 period reconfiguration to map pushbutton combinations onto multiple LED blink frequencies plus steady-on output states.",
+      "Integrated UART diagnostics and Idle-mode execution so firmware behavior remained observable while the control loop stayed interrupt-driven and low power.",
     ],
     frameworks: ["Embedded C", "PIC24F16KA101", "UART", "Timer3", "CN Interrupts", "XC16"],
     projectUrl: "https://github.com/Vincent-Shin/ENSF460-Group-Project-Embedded-System.git",
@@ -259,10 +261,10 @@ const projectDetailsById = {
     background:
       "Built a Godot-based hackathon prototype around progression, scene management, stat recomputation, and arena flow, shipping a playable systems-heavy concept under short deadline pressure.",
     bullets: [
-      "Implemented centralized game state to manage life stages, temporary bonuses, persistent upgrades, rebirth logic, and run-to-run stat recomputation.",
-      "Built deferred scene loading and hub-to-arena transitions through a reusable scene manager instead of scattering transition logic across scenes.",
-      "Connected progression data, combat-stage flow, and enemy-spawn behavior into a coherent gameplay loop for the hackathon prototype.",
-      "Shipped the project quickly under hackathon constraints while still keeping the system structure clean enough to demonstrate deliberate gameplay architecture.",
+      "Implemented a centralized game-state layer to manage life stages, temporary modifiers, persistent upgrades, rebirth logic, and run-to-run stat recomputation.",
+      "Built deferred scene loading and hub-to-arena transitions behind a reusable scene manager instead of duplicating transition logic across Godot scenes.",
+      "Connected progression data, combat-stage orchestration, and enemy-spawn rules into a single gameplay loop with explicit state transitions.",
+      "Shipped a playable vertical slice under hackathon time constraints while preserving enough systems structure to demonstrate deliberate gameplay architecture.",
     ],
     frameworks: ["Godot", "GDScript", "Scene Management", "Game State", "Gameplay Systems", "Hackathon Delivery"],
     projectUrl: "https://devpost.com/software/death-and-rebirth",
@@ -272,11 +274,11 @@ const projectDetailsById = {
     background:
       "Built and iteratively refined this portfolio website as a recruiter-facing product rather than a static personal page, with a strong emphasis on presentation clarity, project storytelling, theme switching, and practical navigation.",
     bullets: [
-      "Designed separate light-mode and dark-mode experiences so the site can read as minimal and professional in one mode while still supporting a more personal and expressive presentation in the other.",
-      "Built structured project browsing with pagination, a detail modal, keyboard navigation, open-close transitions, and project-specific access states for public, private, and request-only work.",
-      "Reworked copy, hierarchy, CTA placement, and sidebar content across multiple iterations to better match recruiter expectations and highlight backend, data, and AI-oriented strengths.",
-      "Curated project ordering, resume targeting, and recruiter-oriented writing so the site functions as a deliberate product showcase instead of a generic portfolio template.",
-      "Added local visual assets, portfolio-specific project metadata, and recruiter-oriented access controls so each project can be presented with the right balance of depth and polish.",
+      "Implemented dual-theme rendering paths with separate presentation logic for light-mode and dark-mode while preserving a shared React state model.",
+      "Built paginated project navigation, modal detail views, keyboard shortcuts, conditional access states, and animated open-close transitions inside a single TypeScript app surface.",
+      "Structured project metadata, resume variants, and recruiter-facing copy as app-level data objects so content targeting could be updated without rewriting layout logic.",
+      "Integrated local asset pipelines, project-specific repository links, and conditional certificate or contact states to support mixed public and private project access patterns.",
+      "Refined layout hierarchy, sidebar state, and CTA flows as product-level interaction decisions rather than treating the site as a static frontend mockup.",
     ],
     frameworks: ["React", "TypeScript", "Vite", "Tailwind CSS", "Lucide React", "Responsive UI", "UI Content Strategy", "Interaction Design", "Portfolio Information Architecture"],
     projectUrl: "https://github.com/Vincent-Shin/professional-portfolio-website",
@@ -295,7 +297,7 @@ const projectMetaById = {
   "project-jfreechart-testing-project": "Software Testing Labs | April 2025",
   "project-embedded-systems-control-project": "Embedded Firmware Project | December 2025",
   "project-calgary-hackathon-arena-system": "Hackathon Game Systems | February 2026",
-  "project-portfolio-website-system": "Frontend Product System | 2026",
+  "project-portfolio-website-system": "Engineering Portfolio Platform | 2026",
 } as const;
 
 const capabilityGroups = [
@@ -473,10 +475,10 @@ const resumeVariants = [
 ];
 
 const resumePdfByKey = {
-  backend: "/resumes/backend-resume.pdf",
-  ai: "/resumes/ai-engineering-resume.pdf",
-  data: "/resumes/data-scientist-resume.pdf",
-  software: "/resumes/software-engineering-resume.pdf",
+  backend: assetPath("/resumes/backend-resume.pdf"),
+  ai: assetPath("/resumes/ai-engineering-resume.pdf"),
+  data: assetPath("/resumes/data-scientist-resume.pdf"),
+  software: assetPath("/resumes/software-engineering-resume.pdf"),
 };
 
 const resumeMetaByKey = {
@@ -612,6 +614,12 @@ const sideProfileRows = {
   ],
 };
 
+type ChatMessage = {
+  id: string;
+  role: "assistant" | "user" | "system";
+  content: string;
+};
+
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
@@ -634,6 +642,46 @@ function renderHighlightedBullet(bullet: string, frameworks: readonly string[]) 
         "R-squared",
         "R-squared score",
         "UI tests",
+        "light-mode",
+        "dark-mode",
+        "keyboard navigation",
+        "open-close transitions",
+        "project-specific access states",
+        "sidebar content",
+        "recruiter expectations",
+        "project ordering",
+        "resume targeting",
+        "visual assets",
+        "project metadata",
+        "access controls",
+        "data cleaning",
+        "feature engineering",
+        "model-selection decisions",
+        "evaluation metrics",
+        "held-out data",
+        "unique-key generation",
+        "upsert logic",
+        "batch scrapers",
+        "seed scripts",
+        "schema initialization",
+        "repository-backed balance lookup",
+        "REST controller",
+        "Kafka listener scaffolding",
+        "service decomposition patterns",
+        "persistent progression",
+        "stage transitions",
+        "leaderboard retrieval",
+        "relational schema",
+        "seat-selection workflows",
+        "cancellation logic",
+        "servlet-based web layer",
+        "quality tooling",
+        "DatabaseManager layer",
+        "domain classes",
+        "change-notification interrupts",
+        "Idle-mode execution",
+        "deferred scene loading",
+        "scene manager",
         "API",
         "BDD",
       ]
@@ -645,6 +693,23 @@ function renderHighlightedBullet(bullet: string, frameworks: readonly string[]) 
   const tokenPattern = new RegExp(`(${emphasisPattern}|\\b\\d+(?:[.,]\\d+)?(?:K\\+|\\+|%|x)?\\b)`, "g");
   const emphasisCheckPattern = new RegExp(`^(?:${emphasisPattern}|\\d+(?:[.,]\\d+)?(?:K\\+|\\+|%|x)?)$`);
   const parts = bullet.split(tokenPattern).filter(Boolean);
+  const hasEmphasis = parts.some((part) => emphasisCheckPattern.test(part));
+
+  if (!hasEmphasis) {
+    const fallbackMatch = bullet.match(/^([^,;]+?)(?=(?:,| so | with | through | instead of | while | under | across )|$)/i);
+
+    if (fallbackMatch) {
+      const leading = fallbackMatch[1];
+      const trailing = bullet.slice(leading.length);
+
+      return [
+        <strong key="fallback-leading" className="font-semibold text-current">
+          {leading}
+        </strong>,
+        trailing,
+      ];
+    }
+  }
 
   return parts.map((part, index) =>
     emphasisCheckPattern.test(part) ? (
@@ -657,6 +722,162 @@ function renderHighlightedBullet(bullet: string, frameworks: readonly string[]) 
   );
 }
 
+function normalizeText(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function getAssistantGreeting(isDark: boolean) {
+  return isDark
+    ? "Hey, I'm basically Vincent's closest referral voice in this portfolio. Ask me about his projects, strengths, personality, availability, or the fastest way to reach him."
+    : "Hello, I'm Trung Tuan Mai's portfolio assistant. I can summarize his projects, target roles, availability, personality, and the fastest way to contact him.";
+}
+
+function getProjectAccessSummary(projectId: keyof typeof projectDetailsById) {
+  const detail = projectDetailsById[projectId];
+
+  if (detail.projectUrl) {
+    return `${detail.projectUrlLabel}: ${detail.projectUrl}`;
+  }
+  if (detail.liveUrl) {
+    return `${detail.liveUrlLabel}: ${detail.liveUrl}`;
+  }
+  if (detail.certificateUrl) {
+    return `${detail.certificateUrlLabel}: ${detail.certificateUrl}`;
+  }
+
+  return detail.projectUrlLabel;
+}
+
+function getProjectMatch(query: string) {
+  const queryTerms = normalizeText(query).split(" ").filter((term) => term.length >= 4);
+  let bestMatch: (typeof projectCards)[number] | null = null;
+  let bestScore = 0;
+
+  for (const project of projectCards) {
+    const detail = projectDetailsById[project.id as keyof typeof projectDetailsById];
+    const haystack = normalizeText(
+      [project.title, project.summary, project.meta, project.stack.join(" "), detail.background, detail.bullets.join(" "), detail.frameworks.join(" ")].join(" "),
+    );
+
+    let score = 0;
+    for (const term of queryTerms) {
+      if (haystack.includes(term)) {
+        score += 1;
+      }
+    }
+
+    if (haystack.includes(normalizeText(query))) {
+      score += 2;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = project;
+    }
+  }
+
+  return bestScore >= 2 ? bestMatch : null;
+}
+
+function getPortfolioAssistantReply(message: string, isDark: boolean) {
+  const query = normalizeText(message);
+  const toneLead = isDark ? "Short answer: " : "";
+  const backendProjects = [
+    "Data Ingestion & Backend System",
+    "Backend Job-Market Simulation System",
+    "JP Morgan Chase Virtual Experience",
+  ];
+  const roleTargets = capabilityGroups[0].items.join(", ");
+  const personName = isDark ? "Vincent" : "Trung Tuan Mai";
+
+  if (!query) {
+    return getAssistantGreeting(isDark);
+  }
+
+  if (
+    query.includes("who he is") ||
+    query.includes("who is he") ||
+    query.includes("who is trung") ||
+    query.includes("who is vincent") ||
+    query.includes("who trung is") ||
+    query.includes("who vincent is") ||
+    query === "who he" ||
+    query === "who is he"
+  ) {
+    return isDark
+      ? "Vincent is a final-year Software Engineering student at the University of Calgary who is strongest in backend systems, data-heavy engineering, and applied ML work. He comes across as someone who actually builds real systems, not just class demos."
+      : "Trung Tuan Mai is a Software Engineering student at the University of Calgary with a portfolio focused on backend systems, data workflows, practical machine learning, and recruiter-ready technical communication.";
+  }
+
+  if (query.includes("personality") || query.includes("what is he like") || query.includes("what his personality") || query.includes("work style") || query.includes("soft skills")) {
+    return isDark
+      ? "Personality-wise, he comes across as friendly, easy to work with, curious, and technically serious. He learns fast, collaborates well, and feels like the kind of teammate who can contribute early without being hard to work with."
+      : "His working style is collaborative, fast-learning, proactive, and easy to work with. The portfolio positions him as technically capable while still approachable, coachable, and strong in team settings.";
+  }
+
+  if (
+    query.includes("is he good") ||
+    query.includes("is trung good") ||
+    query.includes("is vincent good") ||
+    query.includes("good engineer") ||
+    query.includes("good candidate") ||
+    query.includes("worth hiring")
+  ) {
+    return isDark
+      ? "Yeah, he is a strong candidate. The best part is that the portfolio shows real backend, data, ML, and systems work with enough technical depth to back it up, plus he comes across as easy to work with."
+      : "Yes. He presents as a strong early-career candidate with credible backend, data, machine learning, and software engineering work, supported by concrete project depth rather than generic claims.";
+  }
+
+  if (query === "uhm" || query === "hmm" || query === "ok" || query === "okay") {
+    return isDark
+      ? "No problem. Ask me about his backend projects, ML work, personality, availability, or the best way to contact him."
+      : "Sure. You can ask about his projects, backend fit, machine learning experience, personality, availability, or contact details.";
+  }
+
+  if (query.includes("available") || query.includes("availability") || query.includes("work right now") || query.includes("hiring")) {
+    return `${toneLead}Yes. ${personName} is open to full-time, internship, and entry-level opportunities, especially in backend engineering, software engineering, data, ML, and fintech-oriented roles.`;
+  }
+
+  if (query.includes("contact") || query.includes("email") || query.includes("linkedin") || query.includes("reach")) {
+    return `${toneLead}Best contact path is email at trungtuan.mai@ucalgary.ca. LinkedIn is linkedin.com/in/tuanmai3011, and GitHub is github.com/Vincent-Shin.`;
+  }
+
+  if (query.includes("role") || query.includes("target") || query.includes("looking for") || query.includes("fit")) {
+    return `${toneLead}He is targeting ${roleTargets}. The strongest recruiter-facing fit in this portfolio is backend-heavy engineering with solid overlap into data and applied ML work.`;
+  }
+
+  if (query.includes("backend")) {
+    return `${toneLead}The strongest backend examples are ${backendProjects.join(", ")}. Together they show REST APIs, persistence, relational and document databases, ingestion workflows, SQLAlchemy, Spring Boot, and deployment-oriented system design.`;
+  }
+
+  if (query.includes("machine learning") || query.includes("ml") || query.includes("ai") || query.includes("data")) {
+    return `${toneLead}The clearest ML and data work is Predicting Car Sales Revenue, which uses a reproducible scikit-learn pipeline, feature engineering, regression benchmarking, and serialized model packaging over 500K+ rows. Data Ingestion & Backend System also shows ETL-style normalization and API delivery.`;
+  }
+
+  if (query.includes("education") || query.includes("school") || query.includes("degree")) {
+    return `${toneLead}${personName} is a Software Engineering student at the University of Calgary, expected to graduate in April 2027.`;
+  }
+
+  if (query.includes("resume")) {
+    return `${toneLead}The portfolio includes targeted resume variants for backend engineering, data science, AI engineering, and software engineering, so the site can be tailored to different recruiter conversations.`;
+  }
+
+  if (query.includes("strength") || query.includes("why") || query.includes("good candidate")) {
+    return `${toneLead}His strongest signal is range with real systems depth: backend APIs, persistence layers, data pipelines, applied ML, testing-heavy Java work, and a portfolio that explains technical decisions clearly instead of just listing tools.`;
+  }
+
+  const matchedProject = getProjectMatch(message);
+  if (matchedProject) {
+    const detail = projectDetailsById[matchedProject.id as keyof typeof projectDetailsById];
+
+    return `${toneLead}${matchedProject.title} is a strong match here. ${matchedProject.summary} Core stack: ${detail.frameworks.slice(0, 6).join(", ")}. Access: ${getProjectAccessSummary(matchedProject.id as keyof typeof projectDetailsById)}.`;
+  }
+
+  return isDark
+    ? "I can help with backend projects, ML work, resume fit, availability, contact details, or a specific project from the portfolio. Try asking which project best fits backend roles or whether Vincent is available right now."
+    : "I can help with project summaries, backend fit, machine learning experience, availability, resume targeting, or contact information. Try asking which project best matches backend roles or how to contact Vincent.";
+}
+
 export default function App() {
   const [activeResume, setActiveResume] = useState(0);
   const [selectedProjectId, setSelectedProjectId] = useState(projectCards[0].id);
@@ -665,7 +886,10 @@ export default function App() {
   const [theme, setTheme] = useState("light");
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
+  const [chatDraft, setChatDraft] = useState("");
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const previousThemeRef = useRef<string | null>(null);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("portfolio-theme");
@@ -734,7 +958,10 @@ export default function App() {
     if (!soundEnabled) {
       return;
     }
-    if (!force && !isDark) {
+    if (!isDark && !force) {
+      return;
+    }
+    if (!isDark && force && frequency !== 680) {
       return;
     }
 
@@ -770,7 +997,9 @@ export default function App() {
   const handleThemeToggle = () => {
     const nextTheme = isDark ? "light" : "dark";
     setTheme(nextTheme);
-    playUiTick(nextTheme === "dark" ? 680 : 500, true);
+    if (nextTheme === "dark") {
+      playUiTick(680, true);
+    }
   };
 
   const handleSoundToggle = () => {
@@ -865,6 +1094,64 @@ export default function App() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [projectModalOpen, selectedProjectIndex]);
+
+  useEffect(() => {
+    if (chatMessages.length === 0) {
+      setChatMessages([
+        {
+          id: "assistant-greeting",
+          role: "assistant",
+          content: getAssistantGreeting(isDark),
+        },
+      ]);
+    }
+  }, [chatMessages.length, isDark]);
+
+  useEffect(() => {
+    if (previousThemeRef.current === null) {
+      previousThemeRef.current = theme;
+      return;
+    }
+
+    if (previousThemeRef.current === theme) {
+      return;
+    }
+
+    previousThemeRef.current = theme;
+    setChatMessages((messages) => [
+      ...messages,
+      {
+        id: `theme-${Date.now()}`,
+        role: "system",
+        content:
+          theme === "dark"
+            ? "Assistant switched to Vincent's referral voice: more personal, still positive, still recruiter-useful."
+            : "Assistant switched to Trung Tuan Mai portfolio mode: more polished, more professional, and recruiter-facing.",
+      },
+    ]);
+  }, [theme]);
+
+  const submitChatMessage = (rawMessage: string) => {
+    const message = rawMessage.trim();
+    if (!message) {
+      return;
+    }
+
+    const assistantReply = getPortfolioAssistantReply(message, isDark);
+    const timestamp = Date.now().toString();
+
+    setChatMessages((messages) => [
+      ...messages,
+      { id: `user-${timestamp}`, role: "user", content: message },
+      { id: `assistant-${timestamp}`, role: "assistant", content: assistantReply },
+    ]);
+    setChatDraft("");
+    playUiTick(600, true);
+  };
+
+  const chatQuickPrompts = isDark
+    ? ["Is he available to work right now?", "Which projects best fit backend roles?", "How can I contact him?"]
+    : ["Is he available to work right now?", "Which project is strongest for backend roles?", "Can you summarize his ML experience?"];
 
   return (
     <div className={cx("min-h-screen transition-colors duration-500", shellClass)}>
@@ -975,14 +1262,10 @@ export default function App() {
                   Sound
                 </button>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => setChatOpen((open) => !open)}
-                  className={cx("inline-flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm transition-colors", railButtonClass)}
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  Chatbot
-                </button>
+                <div className={cx("inline-flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm", "border-black/10 bg-black/[0.02] text-black/45")}>
+                  <VolumeX className="h-4 w-4" />
+                  Sound Off in Light Mode
+                </div>
               )}
             </div>
             <a
@@ -1249,7 +1532,7 @@ export default function App() {
           <section id="projects" className="scroll-mt-28">
             <div className="space-y-8">
               <div>
-                <h2 className="text-4xl tracking-[-0.04em] md:text-5xl">Selected Projects</h2>
+                <h2 className="text-4xl tracking-[-0.04em] md:text-5xl">Featured Engineering Projects</h2>
                 <p className={cx("mt-4 max-w-3xl text-base leading-7", mutedTextClass)}>
                   A compact project view with four projects per page. Open any card to see the full background, highlights, frameworks, and project access details.
                 </p>
@@ -1707,33 +1990,84 @@ export default function App() {
       )}
       <div className="fixed bottom-6 right-6 z-[80] hidden xl:block">
         {chatOpen && (
-          <div className={cx("mb-3 w-[19rem] rounded-[24px] border p-4 transition-colors duration-500", isDark ? "border-cyan-400/16 bg-[#111723]/96 text-white shadow-[0_30px_80px_rgba(0,0,0,0.4)]" : "border-black/10 bg-white/96 text-[#181818] shadow-[0_20px_60px_rgba(0,0,0,0.16)]")}>
+          <div className={cx("mb-3 flex h-[38rem] w-[28rem] flex-col rounded-[28px] border p-4 transition-colors duration-500", isDark ? "border-cyan-400/16 bg-[#111723]/96 text-white shadow-[0_30px_80px_rgba(0,0,0,0.4)]" : "border-black/10 bg-white/96 text-[#181818] shadow-[0_20px_60px_rgba(0,0,0,0.16)]")}>
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className={cx("text-[11px] uppercase tracking-[0.24em]", softTextClass)}>Portfolio Assistant</p>
-                <p className="mt-1 text-sm">Symbolic chatbot tab</p>
+                <p className={cx("text-[11px] uppercase tracking-[0.24em]", softTextClass)}>{isDark ? "Vincent's Best Referral" : "Trung Tuan Mai Portfolio Assistant"}</p>
+                <p className="mt-1 text-sm">{isDark ? "Friendly, honest, and ready to vouch for him." : "Professional recruiter-facing assistant."}</p>
               </div>
               <button type="button" onClick={() => setChatOpen(false)} className={cx("rounded-full border px-2 py-1 text-xs transition-colors", railButtonClass)}>
                 Close
               </button>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
-              {[
-                "Backend projects?",
-                "What roles is he targeting?",
-                "Education summary",
-                "How can I contact him?",
-              ].map((prompt) => (
+              {chatQuickPrompts.map((prompt) => (
                 <button
                   key={prompt}
                   type="button"
-                  onClick={() => playUiTick(600, true)}
+                  onClick={() => submitChatMessage(prompt)}
                   className={cx("rounded-full border px-3 py-1.5 text-xs transition-colors", isDark ? "border-white/10 bg-white/[0.04] text-white/72 hover:bg-white/[0.08]" : "border-black/10 bg-black/[0.02] text-black/70 hover:bg-black/[0.05]")}
                 >
                   {prompt}
                 </button>
               ))}
             </div>
+            <div className={cx("mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-[22px] border p-3", isDark ? "border-white/10 bg-black/10" : "border-black/10 bg-[#faf8f3]")}>
+              {chatMessages.map((message) => (
+                <div key={message.id} className={cx("flex", message.role === "user" ? "justify-end" : message.role === "system" ? "justify-center" : "justify-start")}>
+                  <div
+                    className={cx(
+                      "max-w-[85%] rounded-[18px] px-4 py-3 text-[13px] leading-6",
+                      message.role === "user"
+                        ? isDark
+                          ? "bg-cyan-300 text-[#0d1117]"
+                          : "bg-black text-white"
+                        : message.role === "system"
+                          ? isDark
+                            ? "border border-cyan-300/16 bg-cyan-300/[0.08] text-center text-white/72"
+                            : "border border-black/10 bg-black/[0.04] text-center text-black/55"
+                        : isDark
+                          ? "border border-white/10 bg-white/[0.04] text-white/86"
+                          : "border border-black/10 bg-white text-black/80",
+                    )}
+                  >
+                    {message.content}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <form
+              className="mt-4 flex items-end gap-3"
+              onSubmit={(event) => {
+                event.preventDefault();
+                submitChatMessage(chatDraft);
+              }}
+            >
+              <label className="sr-only" htmlFor="portfolio-chat-input">
+                Ask the portfolio assistant
+              </label>
+              <input
+                id="portfolio-chat-input"
+                value={chatDraft}
+                onChange={(event) => setChatDraft(event.target.value)}
+                placeholder={isDark ? "Ask about projects, roles, or availability..." : "Ask about backend work, projects, or contact details..."}
+                className={cx(
+                  "min-w-0 flex-1 rounded-[18px] border px-4 py-3 text-sm outline-none transition-colors",
+                  isDark
+                    ? "border-white/10 bg-white/[0.04] text-white placeholder:text-white/34 focus:border-cyan-300/40"
+                    : "border-black/10 bg-[#faf8f3] text-black placeholder:text-black/35 focus:border-black/25",
+                )}
+              />
+              <button
+                type="submit"
+                className={cx(
+                  "rounded-[18px] border px-4 py-3 text-sm transition-colors",
+                  isDark ? "border-cyan-300/18 bg-cyan-300 text-[#0d1117] hover:bg-cyan-200" : "border-black bg-black text-white hover:bg-black/90",
+                )}
+              >
+                Send
+              </button>
+            </form>
           </div>
         )}
         <button
