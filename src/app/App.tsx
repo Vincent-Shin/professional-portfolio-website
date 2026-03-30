@@ -794,6 +794,12 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
     return getAssistantGreeting(isDark);
   }
 
+  if (["hello", "hi", "hey", "yo", "good morning", "good afternoon", "good evening"].includes(query)) {
+    return isDark
+      ? "Hey. Ask me about Vincent's strongest projects, what kind of roles he fits, how he works with people, or whether he is available right now."
+      : "Hello. I can summarize Trung Tuan Mai's strongest projects, target roles, working style, availability, and contact details.";
+  }
+
   if (
     query.includes("who he is") ||
     query.includes("who is he") ||
@@ -878,6 +884,40 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
     : "I can help with project summaries, backend fit, machine learning experience, availability, resume targeting, or contact information. Try asking which project best matches backend roles or how to contact Vincent.";
 }
 
+async function requestPortfolioAssistantReply(message: string, isDark: boolean, history: ChatMessage[]) {
+  const configuredEndpoint = typeof import.meta.env.VITE_PORTFOLIO_CHAT_API_URL === "string" ? import.meta.env.VITE_PORTFOLIO_CHAT_API_URL.trim() : "";
+  const endpoint =
+    configuredEndpoint ||
+    (typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname) ? "/api/chat" : "");
+
+  if (!endpoint) {
+    return getPortfolioAssistantReply(message, isDark);
+  }
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message,
+        theme: isDark ? "dark" : "light",
+        history: history.slice(-8).map((item) => ({ role: item.role, content: item.content })),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Chat API returned ${response.status}`);
+    }
+
+    const data = (await response.json()) as { reply?: string };
+    return typeof data.reply === "string" && data.reply.trim() ? data.reply.trim() : getPortfolioAssistantReply(message, isDark);
+  } catch {
+    return getPortfolioAssistantReply(message, isDark);
+  }
+}
+
 export default function App() {
   const [activeResume, setActiveResume] = useState(0);
   const [selectedProjectId, setSelectedProjectId] = useState(projectCards[0].id);
@@ -888,8 +928,10 @@ export default function App() {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatDraft, setChatDraft] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatPending, setChatPending] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const previousThemeRef = useRef<string | null>(null);
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("portfolio-theme");
@@ -1108,6 +1150,14 @@ export default function App() {
   }, [chatMessages.length, isDark]);
 
   useEffect(() => {
+    if (!chatOpen) {
+      return;
+    }
+
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [chatMessages, chatOpen, chatPending]);
+
+  useEffect(() => {
     if (previousThemeRef.current === null) {
       previousThemeRef.current = theme;
       return;
@@ -1131,22 +1181,30 @@ export default function App() {
     ]);
   }, [theme]);
 
-  const submitChatMessage = (rawMessage: string) => {
+  const submitChatMessage = async (rawMessage: string) => {
     const message = rawMessage.trim();
-    if (!message) {
+    if (!message || chatPending) {
       return;
     }
 
-    const assistantReply = getPortfolioAssistantReply(message, isDark);
     const timestamp = Date.now().toString();
+    const userMessage: ChatMessage = { id: `user-${timestamp}`, role: "user", content: message };
 
     setChatMessages((messages) => [
       ...messages,
-      { id: `user-${timestamp}`, role: "user", content: message },
-      { id: `assistant-${timestamp}`, role: "assistant", content: assistantReply },
+      userMessage,
     ]);
     setChatDraft("");
     playUiTick(600, true);
+    setChatPending(true);
+
+    const assistantReply = await requestPortfolioAssistantReply(message, isDark, [...chatMessages, userMessage]);
+
+    setChatMessages((messages) => [
+      ...messages,
+      { id: `assistant-${timestamp}`, role: "assistant", content: assistantReply },
+    ]);
+    setChatPending(false);
   };
 
   const chatQuickPrompts = isDark
@@ -1163,78 +1221,78 @@ export default function App() {
         </div>
       )}
 
-            <aside className="fixed left-6 top-6 bottom-6 z-60 hidden w-[20.75rem] xl:block">
-        <div className={cx("flex h-full min-h-0 flex-col overflow-hidden rounded-[30px] border p-6 transition-colors duration-500", sidebarClass)}>
+            <aside className="fixed bottom-6 left-6 top-6 z-60 hidden w-[18.75rem] 2xl:block">
+        <div className={cx("flex h-full min-h-0 flex-col overflow-hidden rounded-[28px] border p-5 transition-colors duration-500", sidebarClass)}>
           <div className="min-h-0 flex-1 overflow-y-auto pr-1">
             <div>
-              <h1 className="text-[2.2rem] leading-[1.02] tracking-[-0.05em]">{isDark ? "Vincent Mai" : "Trung Tuan Mai"}</h1>
-              <p className={cx("mt-4 text-[15px] leading-7", mutedTextClass)}>
+              <h1 className="text-[1.75rem] leading-[1.02] tracking-[-0.05em]">{isDark ? "Vincent Mai" : "Trung Tuan Mai"}</h1>
+              <p className={cx("mt-3 text-[14px] leading-6.5", mutedTextClass)}>
                 {isDark
                   ? "Final-year builder into backend systems, data-heavy work, and turning ideas into something real."
                   : "Final-year Software Engineering student building backend systems, data workflows, and practical machine learning projects."}
               </p>
             </div>
 
-            <div className={cx("mt-6 rounded-[24px] border p-4", isDark ? "border-cyan-400/20 bg-cyan-400/8" : "border-black/10 bg-black/[0.02]")}>
+            <div className={cx("mt-4 rounded-[18px] border px-3.5 py-3", isDark ? "border-cyan-300/26 bg-[linear-gradient(180deg,rgba(34,211,238,0.09),rgba(17,24,39,0.28))]" : "border-[#d8c8ad] bg-[linear-gradient(180deg,#f8f3ea,#f2e9db)]")}>
               <div className="flex items-center gap-3">
-                <span className={cx("inline-flex h-2.5 w-2.5 rounded-full", isDark ? "bg-cyan-300 shadow-[0_0_0_6px_rgba(34,211,238,0.14)]" : "bg-black/80 shadow-[0_0_0_6px_rgba(24,24,24,0.08)]")} />
-                <p className={cx("text-[11px] font-medium uppercase tracking-[0.28em]", isDark ? "text-cyan-200" : "text-black/70")}>{isDark ? "Available" : "Professional Profile"}</p>
+                <span className={cx("inline-flex h-2.5 w-2.5 rounded-full", isDark ? "bg-cyan-300 shadow-[0_0_0_6px_rgba(34,211,238,0.16)]" : "bg-[#9a7740] shadow-[0_0_0_6px_rgba(154,119,64,0.10)]")} />
+                <p className={cx("text-[10px] font-medium uppercase tracking-[0.3em]", isDark ? "text-cyan-100/92" : "text-[#8a6d3d]")}>{isDark ? "Profile Note" : "Professional Profile"}</p>
               </div>
-              <p className={cx("mt-3 text-[14px] leading-7", isDark ? "text-cyan-50/90" : "text-black/78")}>
+              <p className={cx("mt-2.5 text-[12.5px] leading-5.5", isDark ? "text-cyan-50/88" : "text-black/74")}>
                 {isDark
-                  ? "Friendly, easy to talk to, and genuinely excited to build useful things with good people."
+                  ? "Calm, collaborative, and strongest when the work is technical, useful, and grounded in real execution."
                   : "Open to meaningful engineering opportunities where I can contribute early, learn quickly, and grow with a strong team."}
               </p>
             </div>
 
-            <div className="mt-6 space-y-4 pb-2 text-[14px]">
+            <div className="mt-4 space-y-3 pb-2 text-[12.5px]">
               {sidebarRows.slice(0, 2).map((row) => (
-                <div key={row.label} className={cx("rounded-[20px] border px-4 py-3", softSurfaceClass)}>
+                <div key={row.label} className={cx("rounded-[17px] border px-3.5 py-3", softSurfaceClass)}>
                   <p className={cx("text-[10px] uppercase tracking-[0.28em]", softTextClass)}>{row.label}</p>
-                  <p className={cx("mt-2 leading-6", mutedTextClass)}>{row.value}</p>
+                  <p className={cx("mt-2 leading-5.5", mutedTextClass)}>{row.value}</p>
                 </div>
               ))}
               {isDark && (
-                <div className={cx("rounded-[20px] border px-4 py-3", softSurfaceClass)}>
+                <div className={cx("rounded-[17px] border px-3.5 py-3", softSurfaceClass)}>
                   <p className={cx("text-[10px] uppercase tracking-[0.28em]", softTextClass)}>Personal Mode</p>
-                  <div className={cx("mt-2 flex items-center gap-3 leading-6", mutedTextClass)}>
+                  <div className={cx("mt-2 flex items-center gap-3 leading-5.5", mutedTextClass)}>
                     <Sparkles className="h-4 w-4" />
                     <span>Personal mode: still technical, just a little more me.</span>
                   </div>
                 </div>
               )}
-              <div className={cx("rounded-[20px] border px-4 py-3", softSurfaceClass)}>
+              <div className={cx("rounded-[17px] border px-3.5 py-3", softSurfaceClass)}>
                 <p className={cx("text-[10px] uppercase tracking-[0.28em]", softTextClass)}>Current Focus</p>
-                <div className={cx("mt-2 space-y-2 text-[14px] leading-6", mutedTextClass)}>
+                <div className={cx("mt-2 space-y-2 text-[12.5px] leading-5.5", mutedTextClass)}>
                   {currentFocusItems.map((item) => (
-                    <div key={item} className={cx("rounded-[14px] border px-3 py-2", isDark ? "border-white/8 bg-white/[0.03]" : "border-black/8 bg-black/[0.02]")}>
+                    <div key={item} className={cx("rounded-[13px] border px-3 py-2", isDark ? "border-white/8 bg-white/[0.03]" : "border-black/8 bg-black/[0.02]")}>
                       {item}
                     </div>
                   ))}
                 </div>
               </div>
-              <div className={cx("rounded-[20px] border px-4 py-3", softSurfaceClass)}>
+              <div className={cx("rounded-[17px] border px-3.5 py-3", softSurfaceClass)}>
                 <p className={cx("text-[10px] uppercase tracking-[0.28em]", softTextClass)}>In Progress Projects</p>
-                <div className={cx("mt-2 space-y-2 text-[14px] leading-6", mutedTextClass)}>
+                <div className={cx("mt-2 space-y-2 text-[12.5px] leading-5.5", mutedTextClass)}>
                   {inProgressProjects.map((project) => (
-                    <div key={project} className={cx("rounded-[14px] border px-3 py-2", isDark ? "border-white/8 bg-white/[0.03]" : "border-black/8 bg-black/[0.02]")}>
+                    <div key={project} className={cx("rounded-[13px] border px-3 py-2", isDark ? "border-white/8 bg-white/[0.03]" : "border-black/8 bg-black/[0.02]")}>
                       {project}
                     </div>
                   ))}
                 </div>
               </div>
-              <div className={cx("rounded-[20px] border px-4 py-3", softSurfaceClass)}>
+              <div className={cx("rounded-[17px] border px-3.5 py-3", softSurfaceClass)}>
                 <p className={cx("text-[10px] uppercase tracking-[0.28em]", softTextClass)}>Exploration Areas</p>
-                <div className={cx("mt-2 space-y-2 text-[14px] leading-6", mutedTextClass)}>
+                <div className={cx("mt-2 space-y-2 text-[12.5px] leading-5.5", mutedTextClass)}>
                   {explorationAreas.map((item) => (
-                    <div key={item} className={cx("rounded-[14px] border px-3 py-2", isDark ? "border-white/8 bg-white/[0.03]" : "border-black/8 bg-black/[0.02]")}>
+                    <div key={item} className={cx("rounded-[13px] border px-3 py-2", isDark ? "border-white/8 bg-white/[0.03]" : "border-black/8 bg-black/[0.02]")}>
                       {item}
                     </div>
                   ))}
                 </div>
               </div>
               {sidebarRows.slice(2).map((row) => (
-                <div key={row.label} className={cx("rounded-[20px] border px-4 py-3", softSurfaceClass)}>
+                <div key={row.label} className={cx("rounded-[18px] border px-3.5 py-3", softSurfaceClass)}>
                   <p className={cx("text-[10px] uppercase tracking-[0.28em]", softTextClass)}>{row.label}</p>
                   <p className={cx("mt-2 leading-6", mutedTextClass)}>{row.value}</p>
                 </div>
@@ -1243,29 +1301,33 @@ export default function App() {
           </div>
 
           <div className="mt-6 space-y-4">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-wrap gap-2.5">
               <button
                 type="button"
                 onClick={handleThemeToggle}
-                className={cx("inline-flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm transition-colors", railButtonClass)}
+                className={cx("inline-flex h-11 items-center justify-center gap-2 rounded-full border px-4 text-[0.95rem] transition-colors", railButtonClass)}
               >
-                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
                 {isDark ? "Light" : "Dark"}
               </button>
               {isDark ? (
                 <button
                   type="button"
                   onClick={handleSoundToggle}
-                  className={cx("inline-flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm transition-colors", railButtonClass)}
+                  className={cx("inline-flex h-11 items-center justify-center gap-2 rounded-full border px-4 text-[0.95rem] transition-colors", railButtonClass)}
                 >
-                  {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                  {soundEnabled ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
                   Sound
                 </button>
               ) : (
-                <div className={cx("inline-flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm", "border-black/10 bg-black/[0.02] text-black/45")}>
-                  <VolumeX className="h-4 w-4" />
-                  Sound Off in Light Mode
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setChatOpen(true)}
+                  className={cx("inline-flex h-11 items-center justify-center gap-2 rounded-full border px-4 text-[0.95rem] transition-colors", "border-black/10 bg-black/[0.02] text-black/70 hover:border-black/20 hover:bg-black/[0.05] hover:text-black")}
+                >
+                  <MessageCircle className="h-3.5 w-3.5" />
+                  Chatbot
+                </button>
               )}
             </div>
             <a
@@ -1286,7 +1348,7 @@ export default function App() {
       </aside>
 
       <nav className={cx("fixed inset-x-0 top-0 z-50 border-b backdrop-blur transition-colors duration-500", navClass)}>
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 sm:py-5">
           <a href="#about" onClick={() => playUiTick(540)} className={cx("text-[15px] uppercase tracking-[0.28em]", isDark ? "text-white" : "text-[#111111]")}>
             Trung Tuan Mai
           </a>
@@ -1312,14 +1374,14 @@ export default function App() {
         </div>
       </nav>
 
-      <main className="px-6 pt-28 pb-20 xl:pl-[23.25rem]">
-        <div className="mx-auto max-w-6xl space-y-20">
-          <section id="about" className="scroll-mt-28 min-h-[calc(100vh-7rem)] flex items-center">
-            <div className="grid w-full gap-8 lg:grid-cols-[1.12fr_0.88fr] lg:items-start">
-              <div className="flex min-h-[470px] flex-col justify-between pr-4">
+      <main className="px-4 pb-14 pt-22 sm:px-5 sm:pb-18 sm:pt-26 lg:px-6 2xl:pl-[21.5rem]">
+        <div className="mx-auto max-w-6xl space-y-16 sm:space-y-20">
+          <section id="about" className="flex min-h-[calc(100vh-6rem)] scroll-mt-28 items-start py-2 lg:items-center">
+            <div className="grid w-full gap-6 xl:grid-cols-[1.08fr_0.92fr] xl:items-start">
+              <div className="flex min-h-[420px] flex-col justify-between pr-0 xl:pr-4">
                 <div className="space-y-5">
-                  <h2 className="max-w-4xl text-7xl leading-[0.92] tracking-[-0.055em] md:text-[7rem]">About Me</h2>
-                  <div className={cx("max-w-4xl space-y-4 text-[1.22rem] leading-[1.82]", mutedTextClass)}>
+                  <h2 className="max-w-4xl text-[clamp(3rem,7vw,5.6rem)] leading-[0.95] tracking-[-0.055em]">About Me</h2>
+                  <div className={cx("max-w-4xl space-y-4 text-[0.98rem] leading-7 sm:text-[1.06rem] sm:leading-[1.72]", mutedTextClass)}>
                     <p>
                       I am Trung Tuan Mai, a final-year Software Engineering student at the University of Calgary interested in backend engineering, data science, machine learning, data engineering, and finance-oriented technology.
                     </p>
@@ -1329,33 +1391,36 @@ export default function App() {
                     <p>
                       I am looking for opportunities where I can contribute early, keep improving fast, and grow into a strong engineering role.
                     </p>
+                    <p>
+                      I care most about building systems that are actually useful: backend services that hold up, data workflows that stay reproducible, and technical work that is clear enough for recruiters and teammates to understand quickly.
+                    </p>
                   </div>
 
-                  <div className={cx("max-w-4xl rounded-[22px] border px-6 py-5", isDark ? "border-cyan-400/20 bg-cyan-400/8" : "border-emerald-200 bg-emerald-50/90")}>
+                  <div className={cx("max-w-4xl rounded-[22px] border px-5 py-4 sm:px-6 sm:py-5", isDark ? "border-cyan-400/20 bg-cyan-400/8" : "border-emerald-200 bg-emerald-50/90")}>
                     <div className="flex items-center gap-3">
                       <span className={cx("inline-flex h-3 w-3 rounded-full", isDark ? "bg-cyan-300 shadow-[0_0_0_6px_rgba(34,211,238,0.14)]" : "bg-emerald-500 shadow-[0_0_0_6px_rgba(16,185,129,0.16)]")} />
                       <p className={cx("text-sm font-medium uppercase tracking-[0.22em]", isDark ? "text-cyan-200" : "text-emerald-700")}>
                         Availability
                       </p>
                     </div>
-                    <p className={cx("mt-3 text-[1.08rem] leading-8", isDark ? "text-cyan-50/88" : "text-emerald-950/85")}>
+                    <p className={cx("mt-3 text-[1rem] leading-8 sm:text-[1.05rem]", isDark ? "text-cyan-50/88" : "text-emerald-950/85")}>
                       Open to full-time, internship, and entry-level opportunities. Open to hybrid or remote roles and able to relocate across Canada.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="relative min-h-[470px]">
+              <div className="relative min-h-[420px]">
                 <div className={cx("absolute inset-x-4 top-4 bottom-0 rounded-[28px] border transition-colors duration-500", isDark ? "border-white/10 bg-white/[0.04] shadow-[0_30px_80px_rgba(0,0,0,0.3)]" : "border-black/8 bg-white shadow-[0_30px_80px_rgba(0,0,0,0.10)]")} />
-                <div className={cx("relative flex h-full min-h-[470px] flex-col rounded-[28px] border p-7 transition-colors duration-500 md:p-8", surfaceClass)}>
+                <div className={cx("relative flex h-full min-h-[420px] flex-col rounded-[28px] border p-5 transition-colors duration-500 sm:p-6 md:p-7", surfaceClass)}>
                   <div className={cx("mb-5 border-b pb-5", isDark ? "border-white/10" : "border-black/10")}>
-                    <p className={cx("text-[1rem] uppercase tracking-[0.28em]", softTextClass)}>Professional Profile</p>
+                    <p className={cx("text-[0.95rem] uppercase tracking-[0.28em]", softTextClass)}>Professional Profile</p>
                   </div>
 
                   <div className="space-y-5">
                     <div>
                       <h3 className={cx("mb-3 text-[14px] uppercase tracking-[0.24em]", softTextClass)}>Education</h3>
-                      <div className={cx("rounded-[20px] border px-5 py-4", softSurfaceClass, mutedTextClass)}>
+                      <div className={cx("rounded-[20px] border px-4 py-4 sm:px-5", softSurfaceClass, mutedTextClass)}>
                         <p className={cx("text-[1.12rem] font-medium", isDark ? "text-white/92" : "text-black/85")}>Bachelor of Science</p>
                         <p className="mt-1 text-[1rem]">Major in Software Engineering</p>
                         <p className="mt-2 text-[1rem] leading-6">
@@ -1371,7 +1436,7 @@ export default function App() {
                         <h3 className={cx("mb-3 text-[14px] uppercase tracking-[0.24em]", softTextClass)}>{group.heading}</h3>
                         <div className="flex flex-wrap gap-2.5">
                           {group.items.map((item) => (
-                            <span key={item} className={cx("rounded-full border px-3.5 py-1.5 text-[1rem]", isDark ? "border-white/10 bg-white/[0.03] text-white/74" : "border-black/10 text-black/72")}>
+                            <span key={item} className={cx("rounded-full border px-3 py-1.5 text-[0.95rem]", isDark ? "border-white/10 bg-white/[0.03] text-white/74" : "border-black/10 text-black/72")}>
                               {item}
                             </span>
                           ))}
@@ -1388,7 +1453,7 @@ export default function App() {
             <div className="space-y-8">
               <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                 <div>
-                  <h2 className="text-4xl tracking-[-0.04em] md:text-5xl">My Resume</h2>
+                <h2 className="text-[clamp(2.4rem,4.8vw,4rem)] tracking-[-0.04em]">My Resume</h2>
                   <p className={cx("mt-2 text-[13px] uppercase tracking-[0.28em]", softTextClass)}>{currentResumeView.label}</p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -1421,7 +1486,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="resume-stack relative px-6 pt-5 pb-6 md:px-8 md:pt-6 md:pb-8">
+              <div className="resume-stack relative px-2 pt-4 pb-5 sm:px-4 md:px-8 md:pt-6 md:pb-8">
                 {visibleLayers.map((layer) => (
                   <div
                     key={layer}
@@ -1436,13 +1501,13 @@ export default function App() {
                   />
                 ))}
 
-                <div className="relative mx-auto w-full max-w-[860px] rounded-[26px] border border-black/10 bg-white px-8 py-8 text-[#181818] shadow-[0_30px_90px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out md:px-10 md:py-9" style={{ zIndex: 10 }}>
+                <div className="relative mx-auto w-full max-w-[860px] rounded-[24px] border border-black/10 bg-white px-5 py-6 text-[#181818] shadow-[0_24px_70px_rgba(0,0,0,0.1)] transition-all duration-500 ease-out sm:px-6 md:px-10 md:py-9" style={{ zIndex: 10 }}>
                   <div className="border-b border-black/10 pb-7">
-                    <h3 className="text-[2rem] tracking-[0.08em]">TRUNG TUAN MAI</h3>
+                    <h3 className="text-[1.65rem] tracking-[0.08em] sm:text-[1.8rem] md:text-[2rem]">TRUNG TUAN MAI</h3>
                     <p className="mt-3 text-[13px] text-black/62">trungtuan.mai@ucalgary.ca | linkedin.com/in/tuanmai3011 | Cell: (825) 488-2472</p>
                   </div>
 
-                  <div className="grid gap-8 border-b border-black/10 py-5 lg:grid-cols-[0.92fr_1.08fr]">
+                  <div className="grid gap-6 border-b border-black/10 py-5 xl:grid-cols-[0.92fr_1.08fr]">
                     <div>
                       <p className="mb-3 text-[12px] uppercase tracking-[0.32em] text-black/48">Education</p>
                       <div className="space-y-1.5 text-[14px] leading-6 text-black/72">
@@ -1491,7 +1556,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="grid gap-8 py-5 lg:grid-cols-[0.92fr_1.08fr]">
+                  <div className="grid gap-6 py-5 xl:grid-cols-[0.92fr_1.08fr]">
                     <div>
                       <p className="mb-3 text-[12px] uppercase tracking-[0.32em] text-black/48">{currentResumeView.extrasTitle}</p>
                       <div className="space-y-5">
@@ -1532,19 +1597,19 @@ export default function App() {
           <section id="projects" className="scroll-mt-28">
             <div className="space-y-8">
               <div>
-                <h2 className="text-4xl tracking-[-0.04em] md:text-5xl">Featured Engineering Projects</h2>
+                <h2 className="text-[clamp(2.2rem,4.8vw,4rem)] tracking-[-0.04em]">Featured Engineering Projects</h2>
                 <p className={cx("mt-4 max-w-3xl text-base leading-7", mutedTextClass)}>
                   A compact project view with four projects per page. Open any card to see the full background, highlights, frameworks, and project access details.
                 </p>
               </div>
 
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid gap-5 lg:grid-cols-2">
                 {pagedProjects.map((project) => (
                   <article
                     id={project.id}
                     key={project.title}
                     className={cx(
-                      "rounded-[28px] border p-6 scroll-mt-28 transition-colors duration-500",
+                      "rounded-[26px] border p-5 scroll-mt-28 transition-colors duration-500 sm:p-6",
                       surfaceClass,
                       selectedProjectId === project.id && (isDark ? "border-cyan-400/30" : "border-black/20"),
                     )}
@@ -1633,7 +1698,7 @@ export default function App() {
             <div className={cx("rounded-[32px] border px-7 py-8 transition-colors duration-500 md:px-12 md:py-12", surfaceClass)}>
               <div className={isDark ? "max-w-3xl" : "max-w-2xl"}>
                 <p className={cx("text-xs uppercase tracking-[0.35em]", softTextClass)}>Contact Me</p>
-                <h2 className="mt-2 text-4xl tracking-[-0.04em] md:text-5xl">{isDark ? "Let's talk" : "Let's connect"}</h2>
+                <h2 className="mt-2 text-[clamp(2.2rem,4.8vw,4rem)] tracking-[-0.04em]">{isDark ? "Let's talk" : "Let's connect"}</h2>
                 {isDark && (
                   <p className={cx("mt-4 text-base leading-7", mutedTextClass)}>
                     If you are hiring, or building a fun, collaborative, high-energy team where people learn fast and enjoy working together, I would love to connect.
@@ -1988,9 +2053,9 @@ export default function App() {
           </div>
         </div>
       )}
-      <div className="fixed bottom-6 right-6 z-[80] hidden xl:block">
+      <div className="fixed bottom-4 right-4 z-[80] sm:bottom-6 sm:right-6">
         {chatOpen && (
-          <div className={cx("mb-3 flex h-[38rem] w-[28rem] flex-col rounded-[28px] border p-4 transition-colors duration-500", isDark ? "border-cyan-400/16 bg-[#111723]/96 text-white shadow-[0_30px_80px_rgba(0,0,0,0.4)]" : "border-black/10 bg-white/96 text-[#181818] shadow-[0_20px_60px_rgba(0,0,0,0.16)]")}>
+          <div className={cx("mb-3 flex h-[min(70vh,38rem)] w-[min(92vw,28rem)] flex-col rounded-[28px] border p-4 transition-colors duration-500", isDark ? "border-cyan-400/16 bg-[#111723]/96 text-white shadow-[0_30px_80px_rgba(0,0,0,0.4)]" : "border-black/10 bg-white/96 text-[#181818] shadow-[0_20px_60px_rgba(0,0,0,0.16)]")}>
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className={cx("text-[11px] uppercase tracking-[0.24em]", softTextClass)}>{isDark ? "Vincent's Best Referral" : "Trung Tuan Mai Portfolio Assistant"}</p>
@@ -2035,6 +2100,14 @@ export default function App() {
                   </div>
                 </div>
               ))}
+              {chatPending && (
+                <div className="flex justify-start">
+                  <div className={cx("rounded-[18px] border px-4 py-3 text-[13px] leading-6", isDark ? "border-white/10 bg-white/[0.04] text-white/70" : "border-black/10 bg-white text-black/60")}>
+                    Thinking...
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
             </div>
             <form
               className="mt-4 flex items-end gap-3"

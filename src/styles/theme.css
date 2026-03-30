@@ -1,7 +1,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-size: 16px;
+  --font-size: 14.5px;
   --background: #ffffff;
   --foreground: oklch(0.145 0 0);
   --card: #ffffff;
@@ -178,6 +178,18 @@
     font-size: var(--text-base);
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --font-size: 13.5px;
+  }
+}
+
+@media (min-width: 1536px) {
+  :root {
+    --font-size: 15px;
   }
 }
 

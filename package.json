@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "dev:api": "node server/chat-api.mjs",
+    "test:api": "node server/test-chat.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
