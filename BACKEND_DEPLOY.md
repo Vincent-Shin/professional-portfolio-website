@@ -61,6 +61,54 @@ Why:
 - has `cf-ipcountry` available
 - fits lightweight chatbot + telemetry well
 
+## Cloudflare-first deploy steps
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Login to Cloudflare:
+
+```bash
+npx wrangler login
+```
+
+3. Create the D1 database:
+
+```bash
+npx wrangler d1 create vincent-portfolio-telemetry
+```
+
+4. Copy the returned `database_id` into [wrangler.toml](/c:/Users/vince/portfolio%20websiter/Dark%20Professional%20Portfolio%20UI/wrangler.toml)
+
+5. Apply the migration:
+
+```bash
+npm run cf:d1:apply
+```
+
+6. Set the Gemini secret:
+
+```bash
+npx wrangler secret put GEMINI_API_KEY
+```
+
+7. Deploy the Worker:
+
+```bash
+npm run cf:deploy
+```
+
+8. Copy the Worker URL and set the frontend env:
+
+```env
+VITE_PORTFOLIO_CHAT_API_URL=https://YOUR-WORKER.workers.dev/api/chat
+```
+
+9. Rebuild/redeploy the frontend.
+
 ## Minimum production checklist
 
 1. Deploy backend with a public URL.

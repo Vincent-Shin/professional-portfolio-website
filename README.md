@@ -38,6 +38,32 @@ npm run build
 
 File build se nam trong thu muc `dist/`.
 
+## Chatbot AI backend
+
+Repo nay hien co 2 backend option:
+
+- `server/chat-api.mjs`: Node local backend de dev/test nhanh
+- `cloudflare/worker.mjs`: Cloudflare Worker backend de deploy free-tier de nhat
+
+### Test Node local backend
+
+```bash
+npm run dev:api
+```
+
+### Deploy-friendly Cloudflare scripts
+
+```bash
+npm run cf:dev
+npm run cf:deploy
+npm run cf:d1:apply
+```
+
+Huong dan day du nam trong:
+
+- `BACKEND_DEPLOY.md`
+- `MODEL_BEHAVIOR.md`
+
 ## Website hien trong nhu the nao
 
 Website la mot landing page portfolio 1 trang, co 2 che do:
@@ -57,7 +83,7 @@ Ngoai noi dung chinh con co:
 - Sidebar co dinh ben trai tren man hinh lon
 - Thanh nav phia tren
 - Theme toggle light/dark
-- Chatbot panel dang mock UI
+- Chatbot panel da co AI/backend integration + local fallback
 - Nut tai resume theo variant dang chon
 
 ## Muon sua gi thi vao dau

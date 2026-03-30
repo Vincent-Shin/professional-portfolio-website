@@ -7,7 +7,10 @@
     "build": "vite build",
     "dev": "vite",
     "dev:api": "node server/chat-api.mjs",
-    "test:api": "node server/test-chat.mjs"
+    "test:api": "node server/test-chat.mjs",
+    "cf:dev": "wrangler dev",
+    "cf:deploy": "wrangler deploy",
+    "cf:d1:apply": "wrangler d1 migrations apply vincent-portfolio-telemetry"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
@@ -71,7 +74,8 @@
     "@tailwindcss/vite": "4.1.12",
     "@vitejs/plugin-react": "4.7.0",
     "tailwindcss": "4.1.12",
-    "vite": "6.3.5"
+    "vite": "6.3.5",
+    "wrangler": "^4.41.0"
   },
   "peerDependencies": {
     "react": "18.3.1",
