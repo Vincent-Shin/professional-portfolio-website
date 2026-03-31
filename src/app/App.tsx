@@ -741,8 +741,8 @@ function normalizeText(value: string) {
 
 function getAssistantGreeting(isDark: boolean) {
   return isDark
-    ? "Hey, I'm the portfolio assistant in a more personal mode. Ask me about Vincent's projects, strengths, availability, or the fastest way to reach him."
-    : "Hello, I'm Trung Tuan Mai's portfolio assistant. I can summarize his projects, target roles, availability, personality, and the fastest way to contact him.";
+    ? "Hey, I can give you the more personal read on Vincent. Ask me about his strongest projects, what kind of roles suit him, or the best way to reach him."
+    : "Hello, I'm Trung Tuan Mai's portfolio assistant. I can help with project summaries, role fit, availability, and the best way to contact him.";
 }
 
 function getProjectAccessSummary(projectId: keyof typeof projectDetailsById) {
@@ -794,7 +794,7 @@ function getProjectMatch(query: string) {
 
 function getPortfolioAssistantReply(message: string, isDark: boolean) {
   const query = normalizeText(message);
-  const toneLead = isDark ? "Short answer: " : "";
+  const toneLead = isDark ? "Honestly, " : "";
   const backendProjects = [
     "Data Ingestion & Backend System",
     "Backend Job-Market Simulation System",
@@ -809,8 +809,8 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
 
   if (["hello", "hi", "hey", "yo", "good morning", "good afternoon", "good evening"].includes(query)) {
     return isDark
-      ? "Hey. Ask me about Vincent's strongest projects, what kind of roles he fits, how he works with people, or whether he is available right now."
-      : "Hello. I can summarize Trung Tuan Mai's strongest projects, target roles, working style, availability, and contact details.";
+      ? "Hey. If you want the clearest read on Vincent, ask me about his strongest projects, what roles fit him best, how he works with people, or whether he is available right now."
+      : "Hello. I can walk you through Trung Tuan Mai's strongest projects, target roles, working style, availability, and contact details.";
   }
 
   if (
@@ -824,14 +824,14 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
     query === "who is he"
   ) {
     return isDark
-      ? "Vincent is a final-year Software Engineering student at the University of Calgary who is strongest in backend systems, data-heavy engineering, and applied ML work. He comes across as someone who actually builds real systems, not just class demos."
-      : "Trung Tuan Mai is a Software Engineering student at the University of Calgary with a portfolio focused on backend systems, data workflows, practical machine learning, and recruiter-ready technical communication.";
+      ? "Vincent is a final-year Software Engineering student at the University of Calgary, and his strongest lane is backend systems, data-heavy engineering, and applied machine learning. What stands out is that his portfolio feels grounded in real implementation work, not just surface-level class demos."
+      : "Trung Tuan Mai is a Software Engineering student at the University of Calgary with a portfolio centered on backend systems, data workflows, practical machine learning, and clearly presented technical work.";
   }
 
   if (query.includes("personality") || query.includes("what is he like") || query.includes("what his personality") || query.includes("work style") || query.includes("soft skills")) {
     return isDark
-      ? "Personality-wise, he comes across as friendly, easy to work with, curious, and technically serious. He learns fast, collaborates well, and feels like the kind of teammate who can contribute early without being hard to work with."
-      : "His working style is collaborative, fast-learning, proactive, and easy to work with. The portfolio positions him as technically capable while still approachable, coachable, and strong in team settings.";
+      ? "He comes across as friendly, easy to work with, and genuinely serious about the technical side of the work. He learns quickly, collaborates well, and feels like the kind of teammate who can contribute early without creating friction."
+      : "His working style comes across as collaborative, proactive, fast-learning, and easy to work with. The portfolio presents him as technically capable while still approachable, coachable, and strong in team settings.";
   }
 
   if (
@@ -843,22 +843,24 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
     query.includes("worth hiring")
   ) {
     return isDark
-      ? "Yeah, he is a strong candidate. The best part is that the portfolio shows real backend, data, ML, and systems work with enough technical depth to back it up, plus he comes across as easy to work with."
-      : "Yes. He presents as a strong early-career candidate with credible backend, data, machine learning, and software engineering work, supported by concrete project depth rather than generic claims.";
+      ? "Yeah, I think he is a strong candidate. The strongest signal is that the portfolio shows real backend, data, ML, and systems work with enough technical depth to back it up, and he still comes across as someone people would actually want to work with."
+      : "Yes. He comes across as a strong early-career candidate with credible backend, data, machine learning, and software engineering work, supported by concrete project depth rather than generic claims.";
   }
 
   if (query === "uhm" || query === "hmm" || query === "ok" || query === "okay") {
     return isDark
-      ? "No problem. Ask me about his backend projects, ML work, personality, availability, or the best way to contact him."
-      : "Sure. You can ask about his projects, backend fit, machine learning experience, personality, availability, or contact details.";
+      ? "No problem. Ask me about his backend projects, ML work, personality, availability, or the easiest way to reach him."
+      : "Sure. You can ask about his projects, backend fit, machine learning experience, availability, or contact details.";
   }
 
   if (query.includes("available") || query.includes("availability") || query.includes("work right now") || query.includes("hiring")) {
-    return `${toneLead}Yes. ${personName} is open to full-time, internship, and entry-level opportunities, especially in backend engineering, software engineering, data, ML, and fintech-oriented roles.`;
+    return `${toneLead}${personName} is open to full-time, internship, and entry-level opportunities, especially in backend engineering, software engineering, data, ML, and fintech-oriented roles.`;
   }
 
   if (query.includes("contact") || query.includes("email") || query.includes("linkedin") || query.includes("reach")) {
-    return `${toneLead}Best contact path is email at trungtuan.mai@ucalgary.ca. LinkedIn is linkedin.com/in/tuanmai3011, and GitHub is github.com/Vincent-Shin. If you want, you can also use the contact-details form in this chat to send a direct note.`;
+    return isDark
+      ? `${toneLead}the easiest path is email at trungtuan.mai@ucalgary.ca. LinkedIn is linkedin.com/in/tuanmai3011, and if you want to leave a quick note right here, the chat form can send a direct notification too.`
+      : "The best direct contact path is email at trungtuan.mai@ucalgary.ca. LinkedIn is linkedin.com/in/tuanmai3011, and you can also use the contact-details form in this chat to send a direct note.";
   }
 
   if (
@@ -869,47 +871,63 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
     query.includes("recruiter") ||
     query.includes("interview")
   ) {
-    return `${toneLead}You can use the contact-details form in chat to leave your name, email, company, and a short note. That will send a direct notification and the Contact section remains available as a backup path.`;
+    return isDark
+      ? `${toneLead}you can drop your name, email, company, and a short note into the contact form here. That sends a direct notification, and the Contact section is still there if you prefer the usual route.`
+      : "You can use the contact-details form in chat to leave your name, email, company, and a short note. That sends a direct notification, and the Contact section remains available as a backup path.";
   }
 
   if (query.includes("fallback") || query.includes("live ai") || query.includes("why not working") || query.includes("why failed") || query.includes("rate limit")) {
-    return `${toneLead}If live AI is temporarily unavailable, the portfolio falls back to a local assistant so the visitor can still get project, resume, and contact answers. The key recruiter information remains available even when the live provider is rate-limited.`;
+    return isDark
+      ? `${toneLead}if the live model gets rate-limited, the site falls back so people can still get solid answers about his projects, resume fit, and contact options. The important recruiter-facing information is still covered.`
+      : "If the live AI is temporarily unavailable, the portfolio falls back to a local assistant so visitors can still get project, resume, and contact answers. The key recruiter-facing information remains available even when the live provider is rate-limited.";
   }
 
   if (query.includes("role") || query.includes("target") || query.includes("looking for") || query.includes("fit")) {
-    return `${toneLead}He is targeting ${roleTargets}. The strongest recruiter-facing fit in this portfolio is backend-heavy engineering with solid overlap into data and applied ML work.`;
+    return isDark
+      ? `${toneLead}he is strongest for ${roleTargets}. If I had to narrow it down, the clearest fit is backend-heavy engineering with real overlap into data and applied ML work.`
+      : `He is targeting ${roleTargets}. The clearest recruiter-facing fit in this portfolio is backend-heavy engineering with solid overlap into data and applied ML work.`;
   }
 
   if (query.includes("backend")) {
-    return `${toneLead}The strongest backend examples are ${backendProjects.join(", ")}. Together they show REST APIs, persistence, relational and document databases, ingestion workflows, SQLAlchemy, Spring Boot, and deployment-oriented system design.`;
+    return isDark
+      ? `${toneLead}the strongest backend examples are ${backendProjects.join(", ")}. Together they show REST APIs, persistence, relational and document databases, ingestion workflows, SQLAlchemy, Spring Boot, and solid system-design thinking.`
+      : `The strongest backend examples are ${backendProjects.join(", ")}. Together they show REST APIs, persistence, relational and document databases, ingestion workflows, SQLAlchemy, Spring Boot, and deployment-oriented system design.`;
   }
 
   if (query.includes("machine learning") || query.includes("ml") || query.includes("ai") || query.includes("data")) {
-    return `${toneLead}The clearest ML and data work is Predicting Car Sales Revenue, which uses a reproducible scikit-learn pipeline, feature engineering, regression benchmarking, and serialized model packaging over 500K+ rows. Data Ingestion & Backend System also shows ETL-style normalization and API delivery.`;
+    return isDark
+      ? `${toneLead}the clearest ML and data signal is Predicting Car Sales Revenue. It shows a reproducible scikit-learn pipeline, feature engineering, regression benchmarking, and model packaging over 500K+ rows. Data Ingestion & Backend System adds a more backend-data angle through normalization and API delivery.`
+      : "The clearest ML and data work is Predicting Car Sales Revenue, which uses a reproducible scikit-learn pipeline, feature engineering, regression benchmarking, and serialized model packaging over 500K+ rows. Data Ingestion & Backend System also shows ETL-style normalization and API delivery.";
   }
 
   if (query.includes("education") || query.includes("school") || query.includes("degree")) {
-    return `${toneLead}${personName} is a Software Engineering student at the University of Calgary, expected to graduate in April 2027.`;
+    return `${personName} is a Software Engineering student at the University of Calgary, expected to graduate in April 2027.`;
   }
 
   if (query.includes("resume")) {
-    return `${toneLead}The portfolio includes targeted resume variants for backend engineering, data science, AI engineering, and software engineering, so the site can be tailored to different recruiter conversations.`;
+    return isDark
+      ? `${toneLead}the portfolio has targeted resume versions for backend engineering, data science, AI engineering, and software engineering, so it is easy to steer the conversation toward the role you care about.`
+      : "The portfolio includes targeted resume variants for backend engineering, data science, AI engineering, and software engineering, so the site can be tailored to different recruiter conversations.";
   }
 
   if (query.includes("strength") || query.includes("why") || query.includes("good candidate")) {
-    return `${toneLead}His strongest signal is range with real systems depth: backend APIs, persistence layers, data pipelines, applied ML, testing-heavy Java work, and a portfolio that explains technical decisions clearly instead of just listing tools.`;
+    return isDark
+      ? `${toneLead}his strongest signal is range with real systems depth. You can see backend APIs, persistence layers, data pipelines, applied ML, testing-heavy Java work, and a portfolio that actually explains technical decisions instead of just listing tools.`
+      : "His strongest signal is range with real systems depth: backend APIs, persistence layers, data pipelines, applied ML, testing-heavy Java work, and a portfolio that explains technical decisions clearly instead of just listing tools.";
   }
 
   const matchedProject = getProjectMatch(message);
   if (matchedProject) {
     const detail = projectDetailsById[matchedProject.id as keyof typeof projectDetailsById];
 
-    return `${toneLead}${matchedProject.title} is a strong match here. ${matchedProject.summary} Core stack: ${detail.frameworks.slice(0, 6).join(", ")}. Access: ${getProjectAccessSummary(matchedProject.id as keyof typeof projectDetailsById)}.`;
+    return isDark
+      ? `${toneLead}${matchedProject.title} is one of the better examples here. ${matchedProject.summary} Core stack includes ${detail.frameworks.slice(0, 6).join(", ")}. Access: ${getProjectAccessSummary(matchedProject.id as keyof typeof projectDetailsById)}.`
+      : `${matchedProject.title} is a strong example here. ${matchedProject.summary} Core stack: ${detail.frameworks.slice(0, 6).join(", ")}. Access: ${getProjectAccessSummary(matchedProject.id as keyof typeof projectDetailsById)}.`;
   }
 
   return isDark
-    ? "I can help with backend projects, ML work, resume fit, availability, contact details, or a specific project from the portfolio. Try asking which project best fits backend roles or whether Vincent is available right now."
-    : "I can help with project summaries, backend fit, machine learning experience, availability, resume targeting, or contact information. Try asking which project best matches backend roles or how to contact Vincent.";
+    ? "I can help with Vincent's backend projects, ML work, role fit, availability, or the best way to contact him. Try asking which project makes the strongest backend case or whether he is available right now."
+    : "I can help with project summaries, backend fit, machine learning experience, availability, resume targeting, or contact information. Try asking which project best fits backend roles or how to contact Trung Tuan Mai.";
 }
 
 const getPortfolioApiBase = () => {
