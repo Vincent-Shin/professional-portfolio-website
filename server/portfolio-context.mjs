@@ -34,6 +34,24 @@ export const portfolioProfile = {
   ],
 };
 
+export function finalizeAssistantReply(reply = "") {
+  const normalized = String(reply).replace(/\s+/g, " ").trim();
+  if (!normalized) {
+    return normalized;
+  }
+
+  if (/[.!?]"?$/.test(normalized)) {
+    return normalized;
+  }
+
+  const lastSentenceEnd = Math.max(normalized.lastIndexOf("."), normalized.lastIndexOf("!"), normalized.lastIndexOf("?"));
+  if (lastSentenceEnd >= Math.floor(normalized.length * 0.55)) {
+    return normalized.slice(0, lastSentenceEnd + 1).trim();
+  }
+
+  return `${normalized.replace(/[\s,:;\-]+$/, "")}.`;
+}
+
 export function buildSystemPrompt(theme = "light", context = {}) {
   const persona =
     theme === "dark"
@@ -58,8 +76,11 @@ export function buildSystemPrompt(theme = "light", context = {}) {
     "Do not invent employers, experience, immigration status, or achievements that are not in the portfolio context.",
     "If the user asks something unrelated, do not fully leave the topic. Briefly answer if needed, then pivot back toward Trung's strengths, projects, background, or why he is worth contacting.",
     "If the answer is uncertain or not explicitly in the portfolio, say that clearly and redirect to the closest relevant project, skill, or contact option.",
-    "Prefer 2-5 sentences. Mention concrete evidence, technologies, or project names when possible.",
+    "Prefer positive framing. Do not speak negatively about Trung. If he does not have an exact skill, bridge to the closest adjacent strengths, projects, or tools that make him relevant anyway.",
+    "Prefer 2-4 sentences, usually under 90 words. Mention concrete evidence, technologies, or project names when possible.",
+    "Always end with a complete sentence. Do not leave unfinished clauses, hanging lists, or cut-off quotes.",
     "When relevant, recommend a specific section of the portfolio to view next: About, Resume, Projects, or Contact.",
+    "If the user seems interested in hiring, talking, or following up, guide them to the Contact section first. Mention that Trung checks messages across his contact platforms daily. You may also say that, if they want, the assistant can notify him directly.",
   ];
 
   const contextRules = [

@@ -3,7 +3,7 @@ import path from "node:path";
 import http from "node:http";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
-import { buildSystemPrompt } from "./portfolio-context.mjs";
+import { buildSystemPrompt, finalizeAssistantReply } from "./portfolio-context.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,6 +48,7 @@ const provider = (process.env.PORTFOLIO_CHAT_PROVIDER ?? "gemini").trim().toLowe
 const allowedOrigin = (process.env.PORTFOLIO_CHAT_ALLOWED_ORIGIN ?? "*").trim();
 const analyticsDir = path.join(projectRoot, "server", "data");
 const analyticsLogPath = path.join(analyticsDir, "telemetry.jsonl");
+const leadsLogPath = path.join(analyticsDir, "leads.jsonl");
 const jsonHeaders = {
   "Content-Type": "application/json; charset=utf-8",
   "Access-Control-Allow-Origin": allowedOrigin,
@@ -120,6 +121,41 @@ function appendTelemetry(entry) {
   fs.appendFileSync(analyticsLogPath, `${JSON.stringify(entry)}\n`, "utf8");
 }
 
+function appendLead(entry) {
+  fs.appendFileSync(leadsLogPath, `${JSON.stringify(entry)}\n`, "utf8");
+}
+
+async function sendDiscordWebhook(title, fields = []) {
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL?.trim();
+  if (!webhookUrl) {
+    return;
+  }
+
+  const cleanFields = fields
+    .filter((field) => field && field.value !== undefined && field.value !== null && String(field.value).trim() !== "")
+    .map((field) => ({
+      name: String(field.name).slice(0, 256),
+      value: String(field.value).slice(0, 1024),
+      inline: Boolean(field.inline),
+    }));
+
+  await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: "Portfolio Assistant Notify",
+      embeds: [
+        {
+          title,
+          color: 0x22c55e,
+          fields: cleanFields,
+          timestamp: new Date().toISOString(),
+        },
+      ],
+    }),
+  });
+}
+
 function getPortfolioUiContext(body = {}) {
   return {
     section: typeof body?.section === "string" ? body.section : "unknown",
@@ -152,7 +188,7 @@ async function callGemini(message, theme, history, context) {
       generationConfig: {
         temperature: theme === "dark" ? 0.9 : 0.6,
         topP: 0.9,
-        maxOutputTokens: 320,
+        maxOutputTokens: 480,
       },
     }),
   });
@@ -167,7 +203,7 @@ async function callGemini(message, theme, history, context) {
     throw new Error("Gemini API returned an empty reply");
   }
 
-  return reply;
+  return finalizeAssistantReply(reply);
 }
 
 async function callOpenAI(message, theme, history, context) {
@@ -186,7 +222,7 @@ async function callOpenAI(message, theme, history, context) {
     body: JSON.stringify({
       model,
       temperature: theme === "dark" ? 0.9 : 0.6,
-      max_tokens: 320,
+      max_tokens: 480,
       messages: [
         { role: "system", content: buildSystemPrompt(theme, context) },
         ...history,
@@ -205,7 +241,7 @@ async function callOpenAI(message, theme, history, context) {
     throw new Error("OpenAI API returned an empty reply");
   }
 
-  return reply;
+  return finalizeAssistantReply(reply);
 }
 
 async function generateReply(message, theme, history, context) {
@@ -238,7 +274,7 @@ const server = http.createServer(async (req, res) => {
     try {
       const body = await readJsonBody(req);
       const context = getRequestContext(req, body);
-      appendTelemetry({
+      const entry = {
         eventType: typeof body?.eventType === "string" ? body.eventType : "unknown_event",
         timestamp: new Date().toISOString(),
         country: context.country,
@@ -250,13 +286,88 @@ const server = http.createServer(async (req, res) => {
         label: typeof body?.label === "string" ? body.label : null,
         question: typeof body?.question === "string" ? body.question : null,
         historyLength: typeof body?.historyLength === "number" ? body.historyLength : null,
-      });
+      };
+      appendTelemetry(entry);
+      if (["chat_open", "chat_message", "link_click", "fallback_question", "contact_prompt_opened"].includes(entry.eventType)) {
+        await sendDiscordWebhook(`Portfolio ${entry.eventType}`, [
+          { name: "Theme", value: entry.theme, inline: true },
+          { name: "Country", value: entry.country, inline: true },
+          { name: "Section", value: typeof body?.section === "string" ? body.section : "unknown", inline: true },
+          { name: "Label", value: entry.label || "-", inline: true },
+          { name: "Question", value: entry.question || "-", inline: false },
+          { name: "Link", value: entry.linkClicked || "-", inline: false },
+          { name: "Page", value: entry.pageUrl || "-", inline: false },
+          { name: "Session", value: entry.sessionHash, inline: false },
+        ]);
+      }
       res.writeHead(202, jsonHeaders);
       res.end(JSON.stringify({ ok: true }));
       return;
     } catch (error) {
       res.writeHead(400, jsonHeaders);
       res.end(JSON.stringify({ error: error instanceof Error ? error.message : "Tracking error" }));
+      return;
+    }
+  }
+
+  if (req.method === "POST" && req.url === "/api/lead") {
+    try {
+      const body = await readJsonBody(req);
+      const context = getRequestContext(req, body);
+      const lead = {
+        timestamp: new Date().toISOString(),
+        sessionHash: context.sessionHash,
+        theme: context.theme,
+        pageUrl: context.pageUrl,
+        section: typeof body?.section === "string" ? body.section : "unknown",
+        resumeLabel: typeof body?.resumeLabel === "string" ? body.resumeLabel : "unknown",
+        selectedProject: typeof body?.selectedProject === "string" ? body.selectedProject : "unknown",
+        name: typeof body?.name === "string" ? body.name.trim() : "",
+        email: typeof body?.email === "string" ? body.email.trim() : "",
+        company: typeof body?.company === "string" ? body.company.trim() : "",
+        role: typeof body?.role === "string" ? body.role.trim() : "",
+        message: typeof body?.message === "string" ? body.message.trim() : "",
+        source: typeof body?.source === "string" ? body.source : "chatbot",
+      };
+
+      if (!lead.name || !lead.email || !lead.message) {
+        res.writeHead(400, jsonHeaders);
+        res.end(JSON.stringify({ error: "Name, email, and message are required" }));
+        return;
+      }
+
+      appendLead(lead);
+      appendTelemetry({
+        eventType: "lead_capture",
+        timestamp: lead.timestamp,
+        country: context.country,
+        referrer: context.referrer,
+        pageUrl: context.pageUrl,
+        theme: context.theme,
+        sessionHash: context.sessionHash,
+        linkClicked: null,
+        label: lead.role || lead.company || "lead_capture",
+        question: lead.message,
+        historyLength: null,
+      });
+      await sendDiscordWebhook("New portfolio lead", [
+        { name: "Name", value: lead.name, inline: true },
+        { name: "Email", value: lead.email, inline: true },
+        { name: "Company", value: lead.company || "-", inline: true },
+        { name: "Role", value: lead.role || "-", inline: true },
+        { name: "Theme", value: lead.theme, inline: true },
+        { name: "Section", value: lead.section, inline: true },
+        { name: "Resume", value: lead.resumeLabel, inline: true },
+        { name: "Project", value: lead.selectedProject, inline: true },
+        { name: "Message", value: lead.message, inline: false },
+        { name: "Page", value: lead.pageUrl || "-", inline: false },
+      ]);
+      res.writeHead(202, jsonHeaders);
+      res.end(JSON.stringify({ ok: true }));
+      return;
+    } catch (error) {
+      res.writeHead(400, jsonHeaders);
+      res.end(JSON.stringify({ error: error instanceof Error ? error.message : "Lead capture error" }));
       return;
     }
   }

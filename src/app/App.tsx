@@ -966,6 +966,15 @@ export default function App() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatPending, setChatPending] = useState(false);
   const [chatMode, setChatMode] = useState<"api" | "fallback" | "local">("local");
+  const [leadFormOpen, setLeadFormOpen] = useState(false);
+  const [leadSubmitting, setLeadSubmitting] = useState(false);
+  const [leadForm, setLeadForm] = useState({
+    name: "",
+    email: "",
+    company: "",
+    role: "",
+    message: "",
+  });
   const audioContextRef = useRef<AudioContext | null>(null);
   const previousThemeRef = useRef<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
@@ -1250,6 +1259,9 @@ export default function App() {
       referrer: typeof document !== "undefined" ? document.referrer : "",
       pageUrl: typeof window !== "undefined" ? window.location.href : "",
       theme: isDark ? "dark" : "light",
+      section: activeSection,
+      resumeLabel: currentResumeView.label,
+      selectedProject: selectedProject.title,
       ...data,
     };
 
@@ -1277,6 +1289,84 @@ export default function App() {
   const handleTrackedExternalClick = (label: string, url: string, frequency = 560) => {
     void trackPortfolioEvent("link_click", { label, linkClicked: url });
     playUiTick(frequency, true);
+  };
+
+  const openContactSection = () => {
+    playUiTick(560, true);
+    setLeadFormOpen(false);
+    document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    void trackPortfolioEvent("contact_prompt_opened", {
+      label: "contact_section",
+      linkClicked: "#contact",
+    });
+  };
+
+  const submitLeadCapture = async () => {
+    const payload = {
+      ...leadForm,
+      source: "chatbot",
+      theme: isDark ? "dark" : "light",
+      section: activeSection,
+      resumeLabel: currentResumeView.label,
+      selectedProject: selectedProject.title,
+      pageUrl: typeof window !== "undefined" ? window.location.href : "",
+      referrer: typeof document !== "undefined" ? document.referrer : "",
+      sessionId: sessionIdRef.current || "anonymous",
+    };
+
+    if (!payload.name.trim() || !payload.email.trim() || !payload.message.trim()) {
+      setChatMessages((messages) => [
+        ...messages,
+        {
+          id: `lead-error-${Date.now()}`,
+          role: "system",
+          content: "Please add at least your name, email, and a short message so I can notify Trung properly.",
+        },
+      ]);
+      return;
+    }
+
+    setLeadSubmitting(true);
+
+    try {
+      const apiBase = getPortfolioApiBase();
+      const endpoint = `${apiBase}/api/lead`;
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": sessionIdRef.current || "anonymous",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Lead API returned ${response.status}`);
+      }
+
+      setLeadFormOpen(false);
+      setLeadForm({ name: "", email: "", company: "", role: "", message: "" });
+      setChatMessages((messages) => [
+        ...messages,
+        {
+          id: `lead-success-${Date.now()}`,
+          role: "system",
+          content: "Thanks. I have logged your interest and can notify Trung directly. He also checks the Contact section platforms daily if you want to message him there too.",
+        },
+      ]);
+    } catch {
+      setChatMessages((messages) => [
+        ...messages,
+        {
+          id: `lead-fallback-${Date.now()}`,
+          role: "system",
+          content: "I could not submit that automatically. Please use the Contact section now, and I recommend emailing or messaging him directly there.",
+        },
+      ]);
+      openContactSection();
+    } finally {
+      setLeadSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -1319,6 +1409,11 @@ export default function App() {
     setChatDraft("");
     playUiTick(600, true);
     setChatPending(true);
+    void trackPortfolioEvent("chat_message", {
+      question: message,
+      historyLength: chatMessages.length + 1,
+      label: "chat_message",
+    });
 
     const assistantReply = await requestPortfolioAssistantReply(message, isDark, [...chatMessages, userMessage], chatContext);
     setChatMode(assistantReply.source);
@@ -1334,6 +1429,10 @@ export default function App() {
       { id: `assistant-${timestamp}`, role: "assistant", content: assistantReply.reply },
     ]);
     setChatPending(false);
+
+    if (/(contact|reach|email|linkedin|hire|interview|message|notify)/i.test(message)) {
+      openContactSection();
+    }
   };
 
   const chatQuickPrompts = isDark
@@ -1456,7 +1555,10 @@ export default function App() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => setChatOpen(true)}
+                  onClick={() => {
+                    setChatOpen(true);
+                    void trackPortfolioEvent("chat_open", { label: "chat_open" });
+                  }}
                   className={cx("inline-flex h-11 items-center justify-center gap-2 rounded-full border px-4 text-[0.95rem] transition-colors", "border-black/10 bg-black/[0.02] text-black/70 hover:border-black/20 hover:bg-black/[0.05] hover:text-black")}
                 >
                   <MessageCircle className="h-3.5 w-3.5" />
@@ -1502,7 +1604,13 @@ export default function App() {
               type="button"
               onClick={() => {
                 playUiTick(610, true);
-                setChatOpen((open) => !open);
+                setChatOpen((open) => {
+                  const next = !open;
+                  if (next) {
+                    void trackPortfolioEvent("chat_open", { label: "chat_open" });
+                  }
+                  return next;
+                });
               }}
               className={cx("inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm transition-colors", railButtonClass)}
             >
@@ -2296,6 +2404,7 @@ export default function App() {
                   playUiTick(610, true);
                   setChatOpen(true);
                   setMobileProfileOpen(false);
+                  void trackPortfolioEvent("chat_open", { label: "chat_open" });
                 }}
                 className={cx("inline-flex h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors", railButtonClass)}
               >
@@ -2318,7 +2427,6 @@ export default function App() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className={cx("text-[11px] uppercase tracking-[0.24em]", softTextClass)}>{isDark ? "Vincent's Best Referral" : "Trung Tuan Mai Portfolio Assistant"}</p>
-                <p className="mt-1 text-sm">{isDark ? "Friendly, honest, and ready to vouch for him." : "Professional recruiter-facing assistant."}</p>
                 <p className={cx("mt-2 text-[11px] uppercase tracking-[0.24em]", chatMode === "api" ? (isDark ? "text-cyan-200/85" : "text-emerald-700") : softTextClass)}>
                   {chatMode === "api" ? "Live AI" : "Fallback Local Assistant"}
                 </p>
@@ -2339,6 +2447,78 @@ export default function App() {
                 </button>
               ))}
             </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={openContactSection}
+                className={cx("rounded-full border px-3 py-1.5 text-xs transition-colors", isDark ? "border-cyan-300/18 bg-cyan-300/[0.08] text-cyan-100 hover:bg-cyan-300/[0.12]" : "border-black/10 bg-black/[0.03] text-black/72 hover:bg-black/[0.06]")}
+              >
+                Open Contact Section
+              </button>
+              <button
+                type="button"
+                onClick={() => setLeadFormOpen((open) => !open)}
+                className={cx("rounded-full border px-3 py-1.5 text-xs transition-colors", isDark ? "border-white/10 bg-white/[0.04] text-white/78 hover:bg-white/[0.08]" : "border-black/10 bg-black/[0.02] text-black/70 hover:bg-black/[0.05]")}
+              >
+                Notify Trung
+              </button>
+            </div>
+            {leadFormOpen && (
+              <div className={cx("mt-3 rounded-[20px] border p-3", isDark ? "border-cyan-300/16 bg-cyan-300/[0.06]" : "border-black/10 bg-[#faf8f3]")}>
+                <p className={cx("text-[11px] uppercase tracking-[0.24em]", softTextClass)}>Notify Trung Directly</p>
+                <p className={cx("mt-2 text-xs leading-5", mutedTextClass)}>He checks messages across his contact platforms daily. If you prefer, I can notify him directly too.</p>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <input
+                    value={leadForm.name}
+                    onChange={(event) => setLeadForm((form) => ({ ...form, name: event.target.value }))}
+                    placeholder="Your name"
+                    className={cx("rounded-[14px] border px-3 py-2 text-sm outline-none transition-colors", isDark ? "border-white/10 bg-white/[0.04] text-white placeholder:text-white/34 focus:border-cyan-300/40" : "border-black/10 bg-white text-black placeholder:text-black/35 focus:border-black/25")}
+                  />
+                  <input
+                    value={leadForm.email}
+                    onChange={(event) => setLeadForm((form) => ({ ...form, email: event.target.value }))}
+                    placeholder="Your email"
+                    className={cx("rounded-[14px] border px-3 py-2 text-sm outline-none transition-colors", isDark ? "border-white/10 bg-white/[0.04] text-white placeholder:text-white/34 focus:border-cyan-300/40" : "border-black/10 bg-white text-black placeholder:text-black/35 focus:border-black/25")}
+                  />
+                  <input
+                    value={leadForm.company}
+                    onChange={(event) => setLeadForm((form) => ({ ...form, company: event.target.value }))}
+                    placeholder="Company"
+                    className={cx("rounded-[14px] border px-3 py-2 text-sm outline-none transition-colors", isDark ? "border-white/10 bg-white/[0.04] text-white placeholder:text-white/34 focus:border-cyan-300/40" : "border-black/10 bg-white text-black placeholder:text-black/35 focus:border-black/25")}
+                  />
+                  <input
+                    value={leadForm.role}
+                    onChange={(event) => setLeadForm((form) => ({ ...form, role: event.target.value }))}
+                    placeholder="Role / interest"
+                    className={cx("rounded-[14px] border px-3 py-2 text-sm outline-none transition-colors", isDark ? "border-white/10 bg-white/[0.04] text-white placeholder:text-white/34 focus:border-cyan-300/40" : "border-black/10 bg-white text-black placeholder:text-black/35 focus:border-black/25")}
+                  />
+                </div>
+                <textarea
+                  value={leadForm.message}
+                  onChange={(event) => setLeadForm((form) => ({ ...form, message: event.target.value }))}
+                  placeholder="What would you like him to know?"
+                  rows={3}
+                  className={cx("mt-2 w-full rounded-[14px] border px-3 py-2 text-sm outline-none transition-colors", isDark ? "border-white/10 bg-white/[0.04] text-white placeholder:text-white/34 focus:border-cyan-300/40" : "border-black/10 bg-white text-black placeholder:text-black/35 focus:border-black/25")}
+                />
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={submitLeadCapture}
+                    disabled={leadSubmitting}
+                    className={cx("rounded-full border px-4 py-2 text-sm transition-colors disabled:opacity-60", isDark ? "border-cyan-300/18 bg-cyan-300 text-[#0d1117] hover:bg-cyan-200" : "border-black bg-black text-white hover:bg-black/90")}
+                  >
+                    {leadSubmitting ? "Sending..." : "Notify Him"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openContactSection}
+                    className={cx("rounded-full border px-4 py-2 text-sm transition-colors", railButtonClass)}
+                  >
+                    Contact Section
+                  </button>
+                </div>
+              </div>
+            )}
             <div className={cx("mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-[22px] border p-3", isDark ? "border-white/10 bg-black/10" : "border-black/10 bg-[#faf8f3]")}>
               {chatMessages.map((message) => (
                 <div key={message.id} className={cx("flex", message.role === "user" ? "justify-end" : message.role === "system" ? "justify-center" : "justify-start")}>
@@ -2409,7 +2589,13 @@ export default function App() {
           type="button"
           onClick={() => {
             playUiTick(610, true);
-            setChatOpen((open) => !open);
+            setChatOpen((open) => {
+              const next = !open;
+              if (next) {
+                void trackPortfolioEvent("chat_open", { label: "chat_open" });
+              }
+              return next;
+            });
           }}
           className={cx("inline-flex items-center gap-2 rounded-full border px-4 py-3 text-sm transition-colors", isDark ? "border-cyan-300/18 bg-[#111723]/96 text-white shadow-[0_20px_60px_rgba(0,0,0,0.34)] hover:bg-[#161d29]" : "border-black/10 bg-white/96 text-black shadow-[0_16px_50px_rgba(0,0,0,0.14)] hover:bg-white")}
         >

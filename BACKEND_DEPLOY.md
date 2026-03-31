@@ -95,6 +95,12 @@ npm run cf:d1:apply
 npx wrangler secret put GEMINI_API_KEY
 ```
 
+Optional but recommended for notifications:
+
+```bash
+npx wrangler secret put DISCORD_WEBHOOK_URL
+```
+
 7. Deploy the Worker:
 
 ```bash
@@ -113,7 +119,9 @@ VITE_PORTFOLIO_CHAT_API_URL=https://YOUR-WORKER.workers.dev/api/chat
 
 1. Deploy backend with a public URL.
 2. Set `GEMINI_API_KEY` as a secret.
-3. Set `PORTFOLIO_CHAT_ALLOWED_ORIGIN` to your real frontend domain.
+3. Set allowed origins in `wrangler.toml`.
+   Example:
+   `ALLOWED_ORIGINS = "https://vincent-shin.github.io,http://localhost:5173"`
 4. Set `VITE_PORTFOLIO_CHAT_API_URL` in the frontend deployment.
 5. Verify:
    - `GET /health`
@@ -122,6 +130,11 @@ VITE_PORTFOLIO_CHAT_API_URL=https://YOUR-WORKER.workers.dev/api/chat
 6. Confirm the frontend shows:
    - `Live AI` when the backend is working
    - `Fallback Local Assistant` when the backend fails
+7. Confirm Discord notifications arrive for:
+   - `chat_open`
+   - `chat_message`
+   - `link_click`
+   - `lead_capture`
 
 ## Telemetry fields currently collected
 
@@ -135,6 +148,16 @@ VITE_PORTFOLIO_CHAT_API_URL=https://YOUR-WORKER.workers.dev/api/chat
 - `question`
 - `historyLength`
 - `timestamp`
+
+## Lead capture
+
+The chatbot can now:
+
+- guide visitors to the `Contact` section first
+- mention that Trung checks messages across contact platforms daily
+- offer to notify him directly
+- submit a lead form to `/api/lead`
+- send Discord notifications when a lead is submitted
 
 ## Current local telemetry storage
 
