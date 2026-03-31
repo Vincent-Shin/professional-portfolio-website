@@ -859,8 +859,8 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
 
   if (query.includes("contact") || query.includes("email") || query.includes("linkedin") || query.includes("reach")) {
     return isDark
-      ? `${toneLead}the easiest path is email at trungtuan.mai@ucalgary.ca. LinkedIn is linkedin.com/in/tuanmai3011, and if you want to leave a quick note right here, the chat form can send a direct notification too.`
-      : "The best direct contact path is email at trungtuan.mai@ucalgary.ca. LinkedIn is linkedin.com/in/tuanmai3011, and you can also use the contact-details form in this chat to send a direct note.";
+      ? `${toneLead}the easiest path is email at maitrungtuan2002@gmail.com. LinkedIn is linkedin.com/in/tuanmai3011, and if you want to leave a quick note right here, the chat form can send a direct notification too.`
+      : "The best direct contact path is email at maitrungtuan2002@gmail.com. LinkedIn is linkedin.com/in/tuanmai3011, and you can also use the contact-details form in this chat to send a direct note.";
   }
 
   if (
@@ -1835,7 +1835,7 @@ export default function App() {
                 <div className="relative mx-auto w-full max-w-[860px] rounded-[24px] border border-black/10 bg-white px-5 py-6 text-[#181818] shadow-[0_24px_70px_rgba(0,0,0,0.1)] transition-all duration-500 ease-out sm:px-6 md:px-10 md:py-9" style={{ zIndex: 10 }}>
                   <div className="border-b border-black/10 pb-7">
                     <h3 className="text-[1.65rem] tracking-[0.08em] sm:text-[1.8rem] md:text-[2rem]">TRUNG TUAN MAI</h3>
-                    <p className="mt-3 text-[13px] text-black/62">trungtuan.mai@ucalgary.ca | linkedin.com/in/tuanmai3011 | Cell: (825) 488-2472</p>
+                    <p className="mt-3 text-[13px] text-black/62">maitrungtuan2002@gmail.com | linkedin.com/in/tuanmai3011 | Cell: (825) 488-2472</p>
                   </div>
 
                   <div className="grid gap-6 border-b border-black/10 py-5 xl:grid-cols-[0.92fr_1.08fr]">
@@ -2047,8 +2047,8 @@ export default function App() {
                         </div>
                         <div className="min-w-0">
                           <p className={cx("text-xs uppercase tracking-[0.24em]", softTextClass)}>Email</p>
-                          <a href="mailto:trungtuan.mai@ucalgary.ca" onClick={() => handleTrackedExternalClick("email", "mailto:trungtuan.mai@ucalgary.ca")} className="mt-2 block break-all text-[1.08rem] leading-7 hover:underline">
-                            trungtuan.mai@ucalgary.ca
+                          <a href="mailto:maitrungtuan2002@gmail.com" onClick={() => handleTrackedExternalClick("email", "mailto:maitrungtuan2002@gmail.com")} className="mt-2 block break-all text-[1.08rem] leading-7 hover:underline">
+                            maitrungtuan2002@gmail.com
                           </a>
                         </div>
                       </div>
@@ -2134,7 +2134,7 @@ export default function App() {
                         If you are hiring and want someone friendly, energetic, and excited to contribute in a positive, people-oriented team culture, I would genuinely love the chance to talk.
                       </p>
                       <div className="mt-5 flex flex-wrap gap-3">
-                        <a href="mailto:trungtuan.mai@ucalgary.ca" onClick={() => playUiTick(580)} className={cx("inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors", actionClass)}>
+                        <a href="mailto:maitrungtuan2002@gmail.com" onClick={() => playUiTick(580)} className={cx("inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors", actionClass)}>
                           <Mail className="h-4 w-4" />
                           Email Me
                         </a>
@@ -2158,8 +2158,8 @@ export default function App() {
                       </div>
                       <div className="min-w-0">
                         <p className={cx("text-xs uppercase tracking-[0.24em]", softTextClass)}>Email</p>
-                          <a href="mailto:trungtuan.mai@ucalgary.ca" onClick={() => handleTrackedExternalClick("email", "mailto:trungtuan.mai@ucalgary.ca")} className="mt-2 block text-[1rem] leading-7 hover:underline">
-                          trungtuan.mai@ucalgary.ca
+                          <a href="mailto:maitrungtuan2002@gmail.com" onClick={() => handleTrackedExternalClick("email", "mailto:maitrungtuan2002@gmail.com")} className="mt-2 block text-[1rem] leading-7 hover:underline">
+                          maitrungtuan2002@gmail.com
                         </a>
                       </div>
                     </div>
@@ -2209,7 +2209,7 @@ export default function App() {
                       Open to full-time, internship, and entry-level opportunities in backend, software engineering, data, and AI-focused roles.
                     </p>
                     <div className="mt-6 flex flex-wrap gap-3">
-                      <a href="mailto:trungtuan.mai@ucalgary.ca" onClick={() => playUiTick(580)} className={cx("inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors", actionClass)}>
+                      <a href="mailto:maitrungtuan2002@gmail.com" onClick={() => playUiTick(580)} className={cx("inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors", actionClass)}>
                         <Mail className="h-4 w-4" />
                         Email Me
                       </a>

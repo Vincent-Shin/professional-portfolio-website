@@ -7,7 +7,7 @@ export const portfolioProfile = {
   workStyle: "Fast learner, proactive teammate, friendly, collaborative, and comfortable adapting quickly in technical environments.",
   interests: ["Backend Engineering", "Data Engineering", "Machine Learning", "Software Engineering", "FinTech", "Quant Development"],
   contact: {
-    email: "trungtuan.mai@ucalgary.ca",
+    email: "maitrungtuan2002@gmail.com",
     linkedin: "linkedin.com/in/tuanmai3011",
   },
   strengths: [
