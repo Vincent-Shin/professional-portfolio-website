@@ -190,6 +190,41 @@ async function sendDiscordWebhook(env, title, fields = []) {
   });
 }
 
+function getProviderLabel(provider) {
+  return provider === "workers-ai" ? "Workers AI backup" : "Gemini";
+}
+
+function extractWorkersAiText(result) {
+  if (typeof result?.response === "string" && result.response.trim()) {
+    return result.response.trim();
+  }
+
+  if (typeof result?.result?.response === "string" && result.result.response.trim()) {
+    return result.result.response.trim();
+  }
+
+  if (Array.isArray(result?.content)) {
+    const text = result.content
+      .map((item) => {
+        if (typeof item?.text === "string") {
+          return item.text;
+        }
+        if (typeof item === "string") {
+          return item;
+        }
+        return "";
+      })
+      .join("")
+      .trim();
+
+    if (text) {
+      return text;
+    }
+  }
+
+  return "";
+}
+
 async function callGemini(env, message, theme, history, context) {
   if (!env.GEMINI_API_KEY) {
     throw new Error("Missing GEMINI_API_KEY");
@@ -232,6 +267,60 @@ async function callGemini(env, message, theme, history, context) {
   return finalizeAssistantReply(reply);
 }
 
+async function callWorkersAI(env, message, theme, history, context) {
+  if (!env.AI || typeof env.AI.run !== "function") {
+    throw new Error("Missing Workers AI binding");
+  }
+
+  const model = env.WORKERS_AI_MODEL || "@cf/meta/llama-3.1-8b-instruct";
+  const result = await env.AI.run(model, {
+    messages: [
+      { role: "system", content: buildSystemPrompt(theme, context) },
+      ...history,
+      { role: "user", content: message },
+    ],
+    max_tokens: 480,
+    temperature: theme === "dark" ? 0.9 : 0.6,
+  });
+
+  const reply = extractWorkersAiText(result);
+  if (!reply) {
+    throw new Error("Workers AI returned an empty reply");
+  }
+
+  return finalizeAssistantReply(reply);
+}
+
+async function generateReply(env, message, theme, history, context) {
+  const primaryProvider = (env.PORTFOLIO_CHAT_PROVIDER || "gemini").trim().toLowerCase();
+  const providerOrder =
+    primaryProvider === "workers-ai"
+      ? ["workers-ai", "gemini"]
+      : ["gemini", "workers-ai"];
+
+  const errors = [];
+
+  for (const provider of providerOrder) {
+    try {
+      const reply =
+        provider === "workers-ai"
+          ? await callWorkersAI(env, message, theme, history, context)
+          : await callGemini(env, message, theme, history, context);
+
+      return {
+        reply,
+        provider,
+        providerLabel: getProviderLabel(provider),
+      };
+    } catch (error) {
+      const messageText = error instanceof Error ? error.message : String(error);
+      errors.push(`${provider}: ${messageText}`);
+    }
+  }
+
+  throw new Error(errors.join(" | ") || "No AI provider available");
+}
+
 export default {
   async fetch(request, env) {
     const allowedOrigin = getAllowedOrigin(request, env);
@@ -249,7 +338,17 @@ export default {
     }
 
     if (request.method === "GET" && url.pathname === "/health") {
-      return json({ ok: true, provider: "gemini", storage: env.PORTFOLIO_DB ? "d1" : "none" }, { status: 200 }, allowedOrigin);
+      return json(
+        {
+          ok: true,
+          provider: (env.PORTFOLIO_CHAT_PROVIDER || "gemini").trim().toLowerCase(),
+          fallbackProvider: env.AI ? "workers-ai" : "none",
+          workersAiModel: env.WORKERS_AI_MODEL || "@cf/meta/llama-3.1-8b-instruct",
+          storage: env.PORTFOLIO_DB ? "d1" : "none",
+        },
+        { status: 200 },
+        allowedOrigin,
+      );
     }
 
     if (request.method === "POST" && url.pathname === "/api/track") {
@@ -271,7 +370,7 @@ export default {
           error: typeof body?.error === "string" ? body.error : null,
         };
         await insertTelemetry(env, entry);
-        if (["chat_open", "chat_message", "link_click", "fallback_question", "contact_prompt_opened"].includes(entry.eventType)) {
+        if (["chat_open", "link_click", "fallback_question", "contact_prompt_opened"].includes(entry.eventType)) {
           await sendDiscordWebhook(env, `Portfolio ${entry.eventType}`, [
             { name: "Theme", value: entry.theme, inline: true },
             { name: "Country", value: entry.country, inline: true },
@@ -333,12 +432,16 @@ export default {
           { name: "Email", value: lead.email, inline: true },
           { name: "Company", value: lead.company || "-", inline: true },
           { name: "Role", value: lead.role || "-", inline: true },
+          { name: "Source", value: lead.source || "chatbot", inline: true },
+          { name: "Country", value: context.country, inline: true },
           { name: "Theme", value: lead.theme, inline: true },
           { name: "Section", value: lead.section, inline: true },
           { name: "Resume", value: lead.resumeLabel, inline: true },
           { name: "Project", value: lead.selectedProject, inline: true },
           { name: "Message", value: lead.message, inline: false },
           { name: "Page", value: lead.pageUrl || "-", inline: false },
+          { name: "Referrer", value: context.referrer || "-", inline: false },
+          { name: "Session", value: context.sessionHash, inline: false },
         ]);
         return json({ ok: true }, { status: 202 }, allowedOrigin);
       } catch (error) {
@@ -360,8 +463,32 @@ export default {
           return json({ error: "Message is required" }, { status: 400 }, allowedOrigin);
         }
 
-        const reply = await callGemini(env, message, theme, history, uiContext);
-        return json({ reply }, { status: 200 }, allowedOrigin);
+        const result = await generateReply(env, message, theme, history, uiContext);
+        const context = await getRequestContext(request, body);
+
+        await sendDiscordWebhook(env, "Portfolio chat message", [
+          { name: "Provider", value: result.providerLabel, inline: true },
+          { name: "Theme", value: context.theme, inline: true },
+          { name: "Country", value: context.country, inline: true },
+          { name: "Section", value: uiContext.section, inline: true },
+          { name: "Resume", value: uiContext.resumeLabel, inline: true },
+          { name: "Project", value: uiContext.selectedProject, inline: true },
+          { name: "Question", value: message, inline: false },
+          { name: "Reply", value: result.reply, inline: false },
+          { name: "Page", value: context.pageUrl || "-", inline: false },
+          { name: "Referrer", value: context.referrer || "-", inline: false },
+          { name: "Session", value: context.sessionHash, inline: false },
+        ]);
+
+        return json(
+          {
+            reply: result.reply,
+            provider: result.provider,
+            providerLabel: result.providerLabel,
+          },
+          { status: 200 },
+          allowedOrigin,
+        );
       } catch (error) {
         try {
           const context = await getRequestContext(request, body);

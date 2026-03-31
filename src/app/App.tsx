@@ -624,6 +624,7 @@ type ChatMessage = {
 type ChatReplyResult = {
   reply: string;
   source: "api" | "fallback";
+  providerLabel?: string;
 };
 
 type PortfolioChatContext = {
@@ -740,7 +741,7 @@ function normalizeText(value: string) {
 
 function getAssistantGreeting(isDark: boolean) {
   return isDark
-    ? "Hey, I'm basically Vincent's closest referral voice in this portfolio. Ask me about his projects, strengths, personality, availability, or the fastest way to reach him."
+    ? "Hey, I'm the portfolio assistant in a more personal mode. Ask me about Vincent's projects, strengths, availability, or the fastest way to reach him."
     : "Hello, I'm Trung Tuan Mai's portfolio assistant. I can summarize his projects, target roles, availability, personality, and the fastest way to contact him.";
 }
 
@@ -857,7 +858,22 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
   }
 
   if (query.includes("contact") || query.includes("email") || query.includes("linkedin") || query.includes("reach")) {
-    return `${toneLead}Best contact path is email at trungtuan.mai@ucalgary.ca. LinkedIn is linkedin.com/in/tuanmai3011, and GitHub is github.com/Vincent-Shin.`;
+    return `${toneLead}Best contact path is email at trungtuan.mai@ucalgary.ca. LinkedIn is linkedin.com/in/tuanmai3011, and GitHub is github.com/Vincent-Shin. If you want, you can also use the contact-details form in this chat to send a direct note.`;
+  }
+
+  if (
+    query.includes("notify") ||
+    query.includes("contact details") ||
+    query.includes("share details") ||
+    query.includes("leave a note") ||
+    query.includes("recruiter") ||
+    query.includes("interview")
+  ) {
+    return `${toneLead}You can use the contact-details form in chat to leave your name, email, company, and a short note. That will send a direct notification and the Contact section remains available as a backup path.`;
+  }
+
+  if (query.includes("fallback") || query.includes("live ai") || query.includes("why not working") || query.includes("why failed") || query.includes("rate limit")) {
+    return `${toneLead}If live AI is temporarily unavailable, the portfolio falls back to a local assistant so the visitor can still get project, resume, and contact answers. The key recruiter information remains available even when the live provider is rate-limited.`;
   }
 
   if (query.includes("role") || query.includes("target") || query.includes("looking for") || query.includes("fit")) {
@@ -946,6 +962,7 @@ async function requestPortfolioAssistantReply(
     return {
       reply: typeof data.reply === "string" && data.reply.trim() ? data.reply.trim() : getPortfolioAssistantReply(message, isDark),
       source: "api",
+      providerLabel: typeof (data as { providerLabel?: string }).providerLabel === "string" ? (data as { providerLabel?: string }).providerLabel : undefined,
     };
   } catch {
     return { reply: getPortfolioAssistantReply(message, isDark), source: "fallback" };
@@ -964,6 +981,7 @@ export default function App() {
   const [activeSection, setActiveSection] = useState("about");
   const [chatDraft, setChatDraft] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [liveProviderLabel, setLiveProviderLabel] = useState("Live AI");
   const [chatPending, setChatPending] = useState(false);
   const [chatMode, setChatMode] = useState<"api" | "fallback" | "local">("local");
   const [leadFormOpen, setLeadFormOpen] = useState(false);
@@ -1291,6 +1309,32 @@ export default function App() {
     playUiTick(frequency, true);
   };
 
+  const maybePromptLeadCapture = (message: string) => {
+    if (!/\b(hire|hiring|interview|recruit|recruiter|contact|email|linkedin|call|schedule|meeting|talk|speak|opportunity|role|position|opening|notify)\b/i.test(message)) {
+      return;
+    }
+
+    setLeadFormOpen(true);
+    setLeadForm((form) => ({
+      ...form,
+      message: form.message || message,
+    }));
+    setChatMessages((messages) => {
+      if (messages.some((entry) => entry.role === "system" && entry.content.includes("leave your contact details here"))) {
+        return messages;
+      }
+
+      return [
+        ...messages,
+        {
+          id: `lead-prompt-${Date.now()}`,
+          role: "system",
+          content: "If you'd like, you can leave your contact details here and I can send a direct notification with your note.",
+        },
+      ];
+    });
+  };
+
   const openContactSection = () => {
     playUiTick(560, true);
     setLeadFormOpen(false);
@@ -1320,7 +1364,7 @@ export default function App() {
         {
           id: `lead-error-${Date.now()}`,
           role: "system",
-          content: "Please add at least your name, email, and a short message so I can notify Trung properly.",
+          content: "Please add at least your name, email, and a short message so I can send a useful notification.",
         },
       ]);
       return;
@@ -1351,7 +1395,7 @@ export default function App() {
         {
           id: `lead-success-${Date.now()}`,
           role: "system",
-          content: "Thanks. I have logged your interest and can notify Trung directly. He also checks the Contact section platforms daily if you want to message him there too.",
+          content: "Thanks. Your note was submitted and a direct notification has been sent. You can also use the Contact section if you want to reach out there as well.",
         },
       ]);
     } catch {
@@ -1387,8 +1431,8 @@ export default function App() {
         role: "system",
         content:
           theme === "dark"
-            ? "Assistant switched to Vincent's referral voice: more personal, still positive, still recruiter-useful."
-            : "Assistant switched to Trung Tuan Mai portfolio mode: more polished, more professional, and recruiter-facing.",
+            ? "Chat style updated for a more personal and approachable conversation."
+            : "Chat style updated for a more polished and professional portfolio conversation.",
       },
     ]);
   }, [theme]);
@@ -1417,6 +1461,7 @@ export default function App() {
 
     const assistantReply = await requestPortfolioAssistantReply(message, isDark, [...chatMessages, userMessage], chatContext);
     setChatMode(assistantReply.source);
+    setLiveProviderLabel(assistantReply.providerLabel ? `Live AI · ${assistantReply.providerLabel}` : "Live AI");
     if (assistantReply.source === "fallback") {
       void trackPortfolioEvent("fallback_question", {
         question: message,
@@ -1430,7 +1475,9 @@ export default function App() {
     ]);
     setChatPending(false);
 
-    if (/(contact|reach|email|linkedin|hire|interview|message|notify)/i.test(message)) {
+    maybePromptLeadCapture(message);
+
+    if (/(contact|reach|email|linkedin)/i.test(message)) {
       openContactSection();
     }
   };
@@ -2428,7 +2475,7 @@ export default function App() {
               <div>
                 <p className={cx("text-[11px] uppercase tracking-[0.24em]", softTextClass)}>{isDark ? "Vincent's Best Referral" : "Trung Tuan Mai Portfolio Assistant"}</p>
                 <p className={cx("mt-2 text-[11px] uppercase tracking-[0.24em]", chatMode === "api" ? (isDark ? "text-cyan-200/85" : "text-emerald-700") : softTextClass)}>
-                  {chatMode === "api" ? "Live AI" : "Fallback Local Assistant"}
+                  {chatMode === "api" ? liveProviderLabel : "Fallback Local Assistant"}
                 </p>
               </div>
               <button type="button" onClick={() => setChatOpen(false)} className={cx("rounded-full border px-2 py-1 text-xs transition-colors", railButtonClass)}>
@@ -2460,13 +2507,13 @@ export default function App() {
                 onClick={() => setLeadFormOpen((open) => !open)}
                 className={cx("rounded-full border px-3 py-1.5 text-xs transition-colors", isDark ? "border-white/10 bg-white/[0.04] text-white/78 hover:bg-white/[0.08]" : "border-black/10 bg-black/[0.02] text-black/70 hover:bg-black/[0.05]")}
               >
-                Notify Trung
+                Share Contact Details
               </button>
             </div>
             {leadFormOpen && (
               <div className={cx("mt-3 rounded-[20px] border p-3", isDark ? "border-cyan-300/16 bg-cyan-300/[0.06]" : "border-black/10 bg-[#faf8f3]")}>
-                <p className={cx("text-[11px] uppercase tracking-[0.24em]", softTextClass)}>Notify Trung Directly</p>
-                <p className={cx("mt-2 text-xs leading-5", mutedTextClass)}>He checks messages across his contact platforms daily. If you prefer, I can notify him directly too.</p>
+                <p className={cx("text-[11px] uppercase tracking-[0.24em]", softTextClass)}>Share Contact Details</p>
+                <p className={cx("mt-2 text-xs leading-5", mutedTextClass)}>Leave your details here and the site can send a direct notification with your note.</p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <input
                     value={leadForm.name}
@@ -2507,7 +2554,7 @@ export default function App() {
                     disabled={leadSubmitting}
                     className={cx("rounded-full border px-4 py-2 text-sm transition-colors disabled:opacity-60", isDark ? "border-cyan-300/18 bg-cyan-300 text-[#0d1117] hover:bg-cyan-200" : "border-black bg-black text-white hover:bg-black/90")}
                   >
-                    {leadSubmitting ? "Sending..." : "Notify Him"}
+                    {leadSubmitting ? "Sending..." : "Send Contact Note"}
                   </button>
                   <button
                     type="button"

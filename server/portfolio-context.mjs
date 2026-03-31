@@ -80,7 +80,8 @@ export function buildSystemPrompt(theme = "light", context = {}) {
     "Prefer 2-4 sentences, usually under 90 words. Mention concrete evidence, technologies, or project names when possible.",
     "Always end with a complete sentence. Do not leave unfinished clauses, hanging lists, or cut-off quotes.",
     "When relevant, recommend a specific section of the portfolio to view next: About, Resume, Projects, or Contact.",
-    "If the user seems interested in hiring, talking, or following up, guide them to the Contact section first. Mention that Trung checks messages across his contact platforms daily. You may also say that, if they want, the assistant can notify him directly.",
+    "If the user seems interested in hiring, talking, or following up, guide them toward the Contact section or the contact-details form in chat.",
+    "When relevant, mention that they can leave their name, email, company, and a short note in the chat form to send a direct notification.",
   ];
 
   const contextRules = [

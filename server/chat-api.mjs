@@ -156,6 +156,10 @@ async function sendDiscordWebhook(title, fields = []) {
   });
 }
 
+function getProviderLabel(providerName) {
+  return providerName === "openai" ? "OpenAI" : "Gemini";
+}
+
 function getPortfolioUiContext(body = {}) {
   return {
     section: typeof body?.section === "string" ? body.section : "unknown",
@@ -288,7 +292,7 @@ const server = http.createServer(async (req, res) => {
         historyLength: typeof body?.historyLength === "number" ? body.historyLength : null,
       };
       appendTelemetry(entry);
-      if (["chat_open", "chat_message", "link_click", "fallback_question", "contact_prompt_opened"].includes(entry.eventType)) {
+      if (["chat_open", "link_click", "fallback_question", "contact_prompt_opened"].includes(entry.eventType)) {
         await sendDiscordWebhook(`Portfolio ${entry.eventType}`, [
           { name: "Theme", value: entry.theme, inline: true },
           { name: "Country", value: entry.country, inline: true },
@@ -355,12 +359,16 @@ const server = http.createServer(async (req, res) => {
         { name: "Email", value: lead.email, inline: true },
         { name: "Company", value: lead.company || "-", inline: true },
         { name: "Role", value: lead.role || "-", inline: true },
+        { name: "Source", value: lead.source || "chatbot", inline: true },
+        { name: "Country", value: context.country, inline: true },
         { name: "Theme", value: lead.theme, inline: true },
         { name: "Section", value: lead.section, inline: true },
         { name: "Resume", value: lead.resumeLabel, inline: true },
         { name: "Project", value: lead.selectedProject, inline: true },
         { name: "Message", value: lead.message, inline: false },
         { name: "Page", value: lead.pageUrl || "-", inline: false },
+        { name: "Referrer", value: context.referrer || "-", inline: false },
+        { name: "Session", value: context.sessionHash, inline: false },
       ]);
       res.writeHead(202, jsonHeaders);
       res.end(JSON.stringify({ ok: true }));
@@ -394,8 +402,22 @@ const server = http.createServer(async (req, res) => {
     }
 
     const reply = await generateReply(message, theme, history, uiContext);
+    const context = getRequestContext(req, body);
+    await sendDiscordWebhook("Portfolio chat message", [
+      { name: "Provider", value: getProviderLabel(provider), inline: true },
+      { name: "Theme", value: context.theme, inline: true },
+      { name: "Country", value: context.country, inline: true },
+      { name: "Section", value: uiContext.section, inline: true },
+      { name: "Resume", value: uiContext.resumeLabel, inline: true },
+      { name: "Project", value: uiContext.selectedProject, inline: true },
+      { name: "Question", value: message, inline: false },
+      { name: "Reply", value: reply, inline: false },
+      { name: "Page", value: context.pageUrl || "-", inline: false },
+      { name: "Referrer", value: context.referrer || "-", inline: false },
+      { name: "Session", value: context.sessionHash, inline: false },
+    ]);
     res.writeHead(200, jsonHeaders);
-    res.end(JSON.stringify({ reply }));
+    res.end(JSON.stringify({ reply, provider, providerLabel: getProviderLabel(provider) }));
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown chat error";
     const statusCode = message.startsWith("Missing ") ? 503 : 500;
