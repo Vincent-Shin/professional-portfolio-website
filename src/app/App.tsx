@@ -1649,7 +1649,8 @@ export default function App() {
       </aside>
 
       <nav className={cx("fixed inset-x-0 top-0 z-50 border-b backdrop-blur transition-colors duration-500", navClass)}>
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 sm:py-5">
+        <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-5">
+          <div className="flex items-center justify-between">
           <a href="#about" onClick={() => playUiTick(540)} className={cx("text-[15px] uppercase tracking-[0.28em]", isDark ? "text-white" : "text-[#111111]")}>
             Trung Tuan Mai
           </a>
@@ -1699,8 +1700,24 @@ export default function App() {
               <button type="button" onClick={handleSoundToggle} className={cx("rounded-full border p-2 transition-colors", railButtonClass)}>
                 {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
               </button>
-            )}
+              )}
             </div>
+          </div>
+        </div>
+          <div className="mt-3 flex gap-2 overflow-x-auto pb-1 md:hidden">
+            {navItems.map((item) => (
+              <a
+                key={`mobile-nav-${item.href}`}
+                href={item.href}
+                onClick={() => playUiTick(520)}
+                className={cx(
+                  "shrink-0 rounded-full border px-3 py-1.5 text-xs transition-colors",
+                  railButtonClass,
+                )}
+              >
+                {item.label}
+              </a>
+            ))}
           </div>
         </div>
       </nav>
