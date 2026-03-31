@@ -742,7 +742,7 @@ function normalizeText(value: string) {
 function getAssistantGreeting(isDark: boolean) {
   return isDark
     ? "Hey, I can give you the more personal read on Vincent. Ask me about his strongest projects, what kind of roles suit him, or the best way to reach him."
-    : "Hello, I'm Trung Tuan Mai's portfolio assistant. I can help with project summaries, role fit, availability, and the best way to contact him.";
+    : "Hello. This portfolio assistant can help with project summaries, role fit, availability, and the best way to contact Trung Tuan Mai.";
 }
 
 function getProjectAccessSummary(projectId: keyof typeof projectDetailsById) {
@@ -810,7 +810,7 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
   if (["hello", "hi", "hey", "yo", "good morning", "good afternoon", "good evening"].includes(query)) {
     return isDark
       ? "Hey. If you want the clearest read on Vincent, ask me about his strongest projects, what roles fit him best, how he works with people, or whether he is available right now."
-      : "Hello. I can walk you through Trung Tuan Mai's strongest projects, target roles, working style, availability, and contact details.";
+      : "Hello. This assistant can walk you through Trung Tuan Mai's strongest projects, target roles, working style, availability, and contact details.";
   }
 
   if (
@@ -927,7 +927,7 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
 
   return isDark
     ? "I can help with Vincent's backend projects, ML work, role fit, availability, or the best way to contact him. Try asking which project makes the strongest backend case or whether he is available right now."
-    : "I can help with project summaries, backend fit, machine learning experience, availability, resume targeting, or contact information. Try asking which project best fits backend roles or how to contact Trung Tuan Mai.";
+    : "This assistant can help with project summaries, backend fit, machine learning experience, availability, resume targeting, or contact information. Try asking which project best fits backend roles or how to contact Trung Tuan Mai.";
 }
 
 const getPortfolioApiBase = () => {
@@ -1519,7 +1519,7 @@ export default function App() {
         </div>
       )}
 
-            <aside className="fixed bottom-6 left-6 top-6 z-60 hidden w-[18.75rem] 2xl:block">
+            <aside className="fixed bottom-6 left-6 top-6 z-60 hidden w-[17.25rem] xl:block 2xl:w-[18.75rem]">
         <div className={cx("flex h-full min-h-0 flex-col overflow-hidden rounded-[28px] border p-5 transition-colors duration-500", sidebarClass)}>
           <div className="min-h-0 flex-1 overflow-y-auto pr-1">
             <div>
@@ -1705,7 +1705,7 @@ export default function App() {
         </div>
       </nav>
 
-      <main className="px-4 pb-14 pt-22 sm:px-5 sm:pb-18 sm:pt-26 lg:px-6 2xl:pl-[21.5rem]">
+      <main className="px-4 pb-14 pt-22 sm:px-5 sm:pb-18 sm:pt-26 lg:px-6 xl:pl-[20rem] 2xl:pl-[21.5rem]">
         <div className="mx-auto max-w-6xl space-y-16 sm:space-y-20">
           <section id="about" className="flex min-h-[calc(100vh-6rem)] scroll-mt-28 items-start py-2 lg:items-center">
             <div className="grid w-full gap-6 xl:grid-cols-[1.08fr_0.92fr] xl:items-start">

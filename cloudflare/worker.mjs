@@ -160,7 +160,7 @@ async function insertLead(env, lead) {
 
 async function sendDiscordWebhook(env, title, fields = []) {
   if (!env.DISCORD_WEBHOOK_URL) {
-    return;
+    throw new Error("Missing DISCORD_WEBHOOK_URL");
   }
 
   const cleanFields = fields
@@ -171,7 +171,7 @@ async function sendDiscordWebhook(env, title, fields = []) {
       inline: Boolean(field.inline),
     }));
 
-  await fetch(env.DISCORD_WEBHOOK_URL, {
+  const response = await fetch(env.DISCORD_WEBHOOK_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -188,6 +188,10 @@ async function sendDiscordWebhook(env, title, fields = []) {
       ],
     }),
   });
+
+  if (!response.ok) {
+    throw new Error(`Discord webhook returned ${response.status}`);
+  }
 }
 
 function getProviderLabel(provider) {
