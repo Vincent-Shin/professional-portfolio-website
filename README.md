@@ -1,57 +1,125 @@
-# Dark Professional Portfolio UI
+# Professional Portfolio Website
 
-Portfolio nay la mot app React + Vite mot trang. Phan lon noi dung va layout hien nam trong mot file duy nhat: `src/app/App.tsx`.
+Recruiter-facing portfolio platform built with React, TypeScript, and Vite, with a production chatbot backend on Cloudflare Workers.
 
-## Stack
+Live website: `https://vincent-shin.github.io/professional-portfolio-website/`
+
+## Overview
+
+This project is a single-page engineering portfolio designed to present:
+
+- targeted resume variants
+- project case studies
+- contact and lead-capture flows
+- a recruiter-facing AI assistant
+- dual light/dark presentation modes
+
+The site is deployed as a static frontend on GitHub Pages and connects to a Cloudflare Worker backend for chatbot, telemetry, and lead capture workflows.
+
+## Architecture
+
+### Frontend
 
 - React 18
-- Vite 6
 - TypeScript
+- Vite 6
 - Tailwind CSS 4
-- Lucide icons
+- Lucide React
 
-## Chay website local
+### Backend
 
-Yeu cau:
+- Cloudflare Workers
+- Cloudflare Workers AI
+- Gemini API
+- Cloudflare D1
+- Discord webhooks
 
-- Node.js 18+ hoac 20+
+### Key product features
+
+- light mode with a more professional recruiter-facing assistant voice
+- dark mode with a more personal referral-style assistant voice
+- AI provider fallback from Gemini to Workers AI
+- telemetry tracking for chat, link clicks, and recruiter interactions
+- chatbot lead capture with Discord notification routing
+- responsive behavior for laptop, desktop, and mobile layouts
+
+## Live Endpoints
+
+- Frontend: `https://vincent-shin.github.io/professional-portfolio-website/`
+- Worker health: `https://vincent-portfolio-chatbot.vincentmai-portfolio.workers.dev/health`
+
+## Repository Structure
+
+```text
+Dark Professional Portfolio UI/
+  cloudflare/
+    worker.mjs                 # production Worker backend
+    migrations/                # D1 migrations
+  public/
+    resumes/                   # downloadable PDF resumes
+    project-visuals/           # project media assets
+  server/
+    chat-api.mjs               # local Node backend for development
+    portfolio-context.mjs      # assistant persona and prompt context
+  src/
+    app/
+      App.tsx                  # main portfolio UI and data
+    styles/
+      theme.css                # theme variables
+      index.css                # global imports
+      tailwind.css             # Tailwind source
+  package.json
+  vite.config.ts
+  wrangler.toml
+```
+
+## Local Development
+
+### Requirements
+
+- Node.js 18+ or 20+
 - npm
 
-Lenh chay:
+### Install
 
 ```bash
 npm install
+```
+
+### Run the frontend
+
+```bash
 npm run dev
 ```
 
-Sau do mo dia chi ma Vite in ra trong terminal, thuong la:
+Default Vite URL:
 
 ```text
 http://localhost:5173
 ```
 
-## Build production
-
-```bash
-npm run build
-```
-
-File build se nam trong thu muc `dist/`.
-
-## Chatbot AI backend
-
-Repo nay hien co 2 backend option:
-
-- `server/chat-api.mjs`: Node local backend de dev/test nhanh
-- `cloudflare/worker.mjs`: Cloudflare Worker backend de deploy free-tier de nhat
-
-### Test Node local backend
+### Run the local backend
 
 ```bash
 npm run dev:api
 ```
 
-### Deploy-friendly Cloudflare scripts
+The frontend can be pointed to either:
+
+- the local Node backend for development
+- the deployed Cloudflare Worker for production-like testing
+
+## Build
+
+```bash
+npm run build
+```
+
+Production output is generated in `dist/`.
+
+## Cloudflare Deployment
+
+Useful commands:
 
 ```bash
 npm run cf:dev
@@ -59,192 +127,66 @@ npm run cf:deploy
 npm run cf:d1:apply
 ```
 
-Huong dan day du nam trong:
+Production configuration is defined in:
 
+- `wrangler.toml`
 - `BACKEND_DEPLOY.md`
 - `MODEL_BEHAVIOR.md`
 
-## Website hien trong nhu the nao
+## Environment Variables
 
-Website la mot landing page portfolio 1 trang, co 2 che do:
+Example values are documented in `.env.example`.
 
-- Light mode: thien ve ho so chuyen nghiep, mau sang, tone tuyen dung chuan
-- Dark mode: ca nhan hon, nhieu hieu ung hon, co sound toggle, social links phu, va mot TikTok embed trong phan contact
+Important variables include:
 
-Luong chinh cua trang:
+- `VITE_PORTFOLIO_CHAT_API_URL`
+- `PORTFOLIO_CHAT_PROVIDER`
+- `GEMINI_API_KEY`
+- `GEMINI_MODEL`
+- `DISCORD_WEBHOOK_URL`
 
-1. `About Me`
-2. `My Resume`
-3. `Projects`
-4. `Contact`
+Do not commit `.env` or any secret values.
 
-Ngoai noi dung chinh con co:
+## Chatbot Workflow
 
-- Sidebar co dinh ben trai tren man hinh lon
-- Thanh nav phia tren
-- Theme toggle light/dark
-- Chatbot panel da co AI/backend integration + local fallback
-- Nut tai resume theo variant dang chon
+The portfolio assistant supports:
 
-## Muon sua gi thi vao dau
+- recruiter-facing project and resume questions
+- contact routing to email or LinkedIn
+- direct lead submission through the chat form
+- telemetry logging for interaction events
+- Discord notifications for chat and lead events
+- fallback inference when the primary provider is unavailable
 
-### 1. Sua menu dieu huong
+Production flow:
 
-File: `src/app/App.tsx`
+1. Frontend sends requests to the Worker API.
+2. The Worker attempts Gemini first.
+3. If Gemini is unavailable or rate-limited, the Worker falls back to Workers AI.
+4. Lead capture and interaction telemetry are stored and routed to Discord notifications.
 
-Bien:
+## Main Files to Edit
 
-- `navItems`
+If you need to update portfolio content quickly, start here:
 
-### 2. Sua danh sach project trong portfolio
-
-File: `src/app/App.tsx`
-
-Bien:
-
-- `projectCards`
-
-Moi project gom:
-
-- `id`: anchor de nhay trong trang
-- `title`: ten project
-- `meta`: dong phu
-- `summary`: mo ta ngan
-- `stack`: tech stack
-- `imageLabel`: nhan placeholder hinh
-
-### 3. Sua nhom skill va role quan tam
-
-File: `src/app/App.tsx`
-
-Bien:
-
-- `capabilityGroups`
-
-### 4. Sua 4 ban resume trong website
-
-File: `src/app/App.tsx`
-
-Cac bien chinh:
-
-- `resumeVariants`: noi dung project theo tung loai resume
-- `resumePdfByKey`: map tu variant sang file PDF
-- `resumeMetaByKey`: core skills cua tung variant
-- `extrasByKey`: extracurricular/additional items
-
-PDF thuc te nam o:
-
-- `public/resumes/backend-resume.pdf`
-- `public/resumes/ai-engineering-resume.pdf`
-- `public/resumes/data-scientist-resume.pdf`
-- `public/resumes/software-engineering-resume.pdf`
-
-Neu ban thay PDF, giu nguyen ten file hoac cap nhat lai `resumePdfByKey`.
-
-### 5. Sua work experience
-
-File: `src/app/App.tsx`
-
-Bien:
-
-- `workExperience`
-
-### 6. Sua phan `Current Progress`
-
-File: `src/app/App.tsx`
-
-Bien:
-
-- `currentProgressProjects`
-
-### 7. Sua noi dung sidebar profile theo light/dark
-
-File: `src/app/App.tsx`
-
-Bien:
-
-- `sideProfileRows`
-
-### 8. Sua phan About / Resume / Projects / Contact trong layout
-
-File: `src/app/App.tsx`
-
-Cac section:
-
-- `#about`
-- `#resume`
-- `#projects`
-- `#contact`
-
-Phan JSX cua cac section nay bat dau gan cac moc sau:
-
-- `#about`: khoang dong 681
-- `#resume`: khoang dong 751
-- `#projects`: khoang dong 896
-- `#contact`: khoang dong 937
-
-### 9. Sua mau sac va theme nen tang
-
-File:
-
+- `src/app/App.tsx`
+- `server/portfolio-context.mjs`
 - `src/styles/theme.css`
+- `public/resumes/*`
 
-Day la noi khai bao CSS variables cho light/dark theme.
+## Verification
 
-### 10. Sua entry app hoac cau hinh build
+The following checks have been validated during development:
 
-File:
+- `npm run build`
+- production frontend deployment on GitHub Pages
+- production Worker deployment on Cloudflare
+- `/health` endpoint response
+- chatbot response path with provider fallback
+- lead submission flow
+- Discord webhook integration
 
-- `src/main.tsx`: entry point
-- `vite.config.ts`: cau hinh Vite
+## Notes
 
-## Cau truc repo quan trong
-
-```text
-Dark Professional Portfolio UI/
-  src/
-    app/
-      App.tsx              # gan nhu toan bo noi dung va layout
-    styles/
-      index.css            # import styles
-      theme.css            # theme variables
-      tailwind.css         # Tailwind source
-      fonts.css            # hien dang trong
-  public/
-    resumes/               # PDF resume de download
-  dist/                    # output sau khi build
-  package.json
-  vite.config.ts
-```
-
-## Hanh vi dac biet dang co trong site
-
-- Theme duoc luu trong `localStorage` voi key `portfolio-theme`
-- Sound mode duoc luu trong `localStorage` voi key `portfolio-sound`
-- Chi dark mode moi co sound toggle that
-- Nut `Download Resume` tai PDF theo resume variant dang chon
-- Chatbot hien chi la giao dien minh hoa, chua co backend/chat logic
-- Contact dark mode co embed TikTok
-
-## Nhung cho nen uu tien tach ra neu muon de maintain hon
-
-Hien tai file `src/app/App.tsx` kha lon. Neu muon de sua lau dai, nen tach dan thanh:
-
-- `src/app/data/portfolio.ts` cho toan bo data
-- `src/app/components/Sidebar.tsx`
-- `src/app/components/AboutSection.tsx`
-- `src/app/components/ResumeSection.tsx`
-- `src/app/components/ProjectsSection.tsx`
-- `src/app/components/ContactSection.tsx`
-
-Nhu vay lan sau chi can sua data thay vi sua ca file JSX dai.
-
-## Tinh trang da kiem tra
-
-Da xac nhan lenh sau chay thanh cong:
-
-```bash
-npm run build
-```
-
-Nghia la project hien build duoc binh thuong.
+- Most portfolio content currently lives in `src/app/App.tsx`.
+- If the project grows further, the next maintainability improvement is to split content and UI into smaller modules.
