@@ -164,6 +164,8 @@ const projectDetailsById = {
     frameworks: ["Flask", "Flask-CORS", "MongoDB", "PyMongo", "Docker", "pdfplumber", "REST API", "Data Ingestion"],
     projectUrl: "https://csgit.ucalgary.ca/jashan.bhinder/seng513-202601-pg-17.git",
     projectUrlLabel: "Open Repository",
+    liveUrl: "https://macrofinder-remix.onrender.com/",
+    liveUrlLabel: "Website Live",
   },
   "project-jp-morgan-chase-virtual-experience": {
     background:
@@ -192,7 +194,7 @@ const projectDetailsById = {
     frameworks: ["Flask", "SQLAlchemy", "SQLite", "Supabase PostgreSQL", "Flask-CORS", "REST API", "Unity WebGL", "Firebase Hosting"],
     projectUrl: "https://github.com/Vincent-Shin/SENG401_PROJECT_GAME_L02_GROUP06",
     projectUrlLabel: "Open GitHub Project",
-    liveUrl: "https://unemployed-simulator-web.web.app/",
+    liveUrl: "https://unemployed-simulator-web-test.web.app",
     liveUrlLabel: "Play Web Build",
   },
   "project-movie-ticket-reservation-system": {
