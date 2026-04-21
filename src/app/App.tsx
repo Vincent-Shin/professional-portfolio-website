@@ -54,7 +54,7 @@ const projectCards = [
       "Global weather forecasting assessment with time-series feature engineering, anomaly detection, model benchmarking, and geospatial analysis.",
     stack: ["Python", "pandas", "scikit-learn", "Plotly", "Jupyter"],
     imageLabel: "Data Science / Forecasting",
-    imageSrc: assetPath("/project-visuals/02-car-sales.png"),
+    imageSrc: assetPath("/project-visuals/Weather.png"),
   },
   {
     id: "project-macrofinder-system",
@@ -64,7 +64,7 @@ const projectCards = [
       "Full-stack restaurant nutrition comparison platform with ingestion pipelines, normalized MongoDB data, role-based workflows, and deployed web delivery.",
     stack: ["Python", "Flask", "MongoDB", "React", "Docker"],
     imageLabel: "Full-stack / Nutrition Platform",
-    imageSrc: assetPath("/project-visuals/04-data-ingestion.png"),
+    imageSrc: assetPath("/project-visuals/marcofinder.png"),
   },
   {
     id: "project-job-assistant-agent",
@@ -74,7 +74,7 @@ const projectCards = [
       "AI-assisted job application backend that supports resume parsing, JD matching, tailored answer generation, and application tracking through FastAPI.",
     stack: ["Python", "FastAPI", "SQLite", "pytest", "Docker"],
     imageLabel: "AI / FastAPI Backend",
-    imageSrc: assetPath("/project-visuals/03-job-market.png"),
+    imageSrc: assetPath("/project-visuals/job-assisstant.png"),
   },
   {
     id: "project-jp-morgan-chase-virtual-experience",
@@ -2741,6 +2741,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
