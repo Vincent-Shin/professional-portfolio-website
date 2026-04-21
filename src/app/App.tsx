@@ -640,11 +640,11 @@ const explorationAreas = [
 
 const projectDisplayOrder = [
   "project-portfolio-website-system",
-  "project-car-sales-revenue",
-  "project-backend-job-market-simulation-system",
-  "project-weather-trend-forecasting-assessment",
   "project-macrofinder-system",
   "project-job-assistant-agent",
+  "project-weather-trend-forecasting-assessment",
+  "project-car-sales-revenue",
+  "project-backend-job-market-simulation-system",
   "project-jp-morgan-chase-virtual-experience",
   "project-java-web-quality-engineering-system",
   "project-embedded-systems-control-project",
@@ -2741,6 +2741,8 @@ export default function App() {
     </div>
   );
 }
+
+
 
 
 
