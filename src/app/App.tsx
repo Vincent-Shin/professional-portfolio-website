@@ -1,4 +1,4 @@
-
+﻿
 import {
   Github,
   Instagram,
@@ -39,7 +39,7 @@ const projectCards = [
   {
     id: "project-car-sales-revenue",
     title: "Predicting Car Sales Revenue",
-    meta: "ENSF 444 � Machine Learning System � December 2025",
+    meta: "ENSF 444 ï¿½ Machine Learning System ï¿½ December 2025",
     summary:
       "Revenue forecasting system built on 500,000+ records with reproducible preprocessing, feature engineering, and regression benchmarking.",
     stack: ["Python", "pandas", "NumPy", "scikit-learn", "joblib"],
@@ -47,19 +47,39 @@ const projectCards = [
     imageSrc: assetPath("/project-visuals/02-car-sales.png"),
   },
   {
-    id: "project-data-ingestion-backend-system",
-    title: "Data Ingestion & Backend System",
-    meta: "SENG 513 � February 2026",
+    id: "project-weather-trend-forecasting-assessment",
+    title: "Weather Trend Forecasting Assessment",
+    meta: "Data Science Forecasting Project ï¿½ April 2026",
     summary:
-      "Backend ingestion pipeline for restaurant menu and nutrition data with normalization, deduplication, enrichment, and API delivery.",
-    stack: ["Python", "Flask", "MongoDB", "Docker", "PyMongo"],
-    imageLabel: "Backend / ETL Pipeline",
+      "Global weather forecasting assessment with time-series feature engineering, anomaly detection, model benchmarking, and geospatial analysis.",
+    stack: ["Python", "pandas", "scikit-learn", "Plotly", "Jupyter"],
+    imageLabel: "Data Science / Forecasting",
+    imageSrc: assetPath("/project-visuals/02-car-sales.png"),
+  },
+  {
+    id: "project-macrofinder-system",
+    title: "MacroFinder",
+    meta: "SENG 513 ï¿½ April 2026",
+    summary:
+      "Full-stack restaurant nutrition comparison platform with ingestion pipelines, normalized MongoDB data, role-based workflows, and deployed web delivery.",
+    stack: ["Python", "Flask", "MongoDB", "React", "Docker"],
+    imageLabel: "Full-stack / Nutrition Platform",
     imageSrc: assetPath("/project-visuals/04-data-ingestion.png"),
+  },
+  {
+    id: "project-job-assistant-agent",
+    title: "Job Assistant Agent",
+    meta: "AI Backend and Data Science Agent System ï¿½ April 2026",
+    summary:
+      "AI-assisted job application backend that supports resume parsing, JD matching, tailored answer generation, and application tracking through FastAPI.",
+    stack: ["Python", "FastAPI", "SQLite", "pytest", "Docker"],
+    imageLabel: "AI / FastAPI Backend",
+    imageSrc: assetPath("/project-visuals/03-job-market.png"),
   },
   {
     id: "project-jp-morgan-chase-virtual-experience",
     title: "JP Morgan Chase Virtual Experience",
-    meta: "Certificate / Simulation � January 2026",
+    meta: "Certificate / Simulation ï¿½ January 2026",
     summary:
       "Spring Boot transaction-processing simulation with persistence, balance retrieval, and Kafka-based event-ingestion scaffolding.",
     stack: ["Java", "Spring Boot", "Spring Data JPA", "Kafka", "H2"],
@@ -69,7 +89,7 @@ const projectCards = [
   {
     id: "project-backend-job-market-simulation-system",
     title: "Backend Job-Market Simulation System",
-    meta: "SENG 401 � February 2026",
+    meta: "SENG 401 ï¿½ February 2026",
     summary:
       "Service-layer backend for a job-market simulation game with persistent player state, progression logic, and application outcomes.",
     stack: ["Python", "Flask", "SQLAlchemy", "SQLite", "REST API"],
@@ -79,7 +99,7 @@ const projectCards = [
   {
     id: "project-movie-ticket-reservation-system",
     title: "Movie Ticket Reservation System",
-    meta: "ENSF 480 � April 2025",
+    meta: "ENSF 480 ï¿½ April 2025",
     summary:
       "Java reservation platform with relational persistence, booking workflows, receipt generation, and cancellation rule enforcement.",
     stack: ["Java", "JDBC", "MySQL", "SQL", "Swing"],
@@ -89,7 +109,7 @@ const projectCards = [
   {
     id: "project-java-web-quality-engineering-system",
     title: "Java Web Quality Engineering System",
-    meta: "ENSF 400 � December 2025",
+    meta: "ENSF 400 ï¿½ December 2025",
     summary:
       "Multi-module Java web application emphasizing quality engineering through automated testing, CI/CD, migration tooling, and validation.",
     stack: ["Java", "Servlets", "Tomcat", "JUnit", "Jenkins"],
@@ -109,7 +129,7 @@ const projectCards = [
   {
     id: "project-jfreechart-testing-project",
     title: "JFreeChart Testing Project",
-    meta: "Testing Project � April 2025",
+    meta: "Testing Project ï¿½ April 2025",
     summary:
       "White-box test suite expansion for core JFreeChart utility classes covering boundary conditions, exceptions, and mock-based isolation.",
     stack: ["Java", "JUnit", "JMock", "White-box Testing"],
@@ -119,7 +139,7 @@ const projectCards = [
   {
     id: "project-embedded-systems-control-project",
     title: "Embedded Systems Control Project",
-    meta: "PIC24F16KA101 � December 2025",
+    meta: "PIC24F16KA101 ï¿½ December 2025",
     summary:
       "Interrupt-driven embedded firmware integrating change notification interrupts, timer-based LED control, UART output, and idle-mode execution.",
     stack: ["Embedded C", "PIC24", "UART", "Timer Interrupts"],
@@ -129,7 +149,7 @@ const projectCards = [
   {
     id: "project-calgary-hackathon-arena-system",
     title: "Calgary Hackathon Arena System",
-    meta: "Hackathon Project � February 2026",
+    meta: "Hackathon Project ï¿½ February 2026",
     summary:
       "Godot-based arena and progression system with centralized game state, scene transitions, spawning logic, and meta-upgrade flow.",
     stack: ["Godot", "GDScript", "Game State", "Scene Systems"],
@@ -152,20 +172,46 @@ const projectDetailsById = {
     projectUrl: "https://github.com/Vincent-Shin/ENSF444---Predicting-Car-Sales-Revenue.git",
     projectUrlLabel: "Open GitHub Project",
   },
-  "project-data-ingestion-backend-system": {
+  "project-weather-trend-forecasting-assessment": {
     background:
-      "Built a backend-heavy ingestion platform for a web-based systems project that collects restaurant menu and nutrition data from multiple sources, normalizes records, enriches prices, and serves the data through a Flask API backed by MongoDB.",
+      "Built an end-to-end weather trend forecasting assessment from global weather observations with notebook-first analysis, reproducible scripting, and model benchmarking across time-series features.",
     bullets: [
-      "Implemented Flask REST endpoints for health checks, collection reads, document upserts, and bulk price mutation with request-shape validation and defensive handling for malformed payloads.",
-      "Used deterministic composite keys plus MongoDB upsert semantics to de-duplicate restaurant, item, and portion documents across repeated ingestion runs.",
-      "Integrated scraper and seed pipelines that parsed menu, pricing, and nutrition sources, then mapped raw records into a normalized backend schema before persistence.",
-      "Packaged schema initialization, seeding, scraper execution, and API serving into a repeatable backend workflow suitable for milestone demos, regression checks, and local redevelopment.",
+      "Cleaned and standardized a 136K+ row global weather dataset, including timestamp parsing, missing-value handling, outlier clipping, and normalization for downstream forecasting reliability.",
+      "Engineered time-series lag features and benchmarked Naive baseline, Linear Regression, Random Forest, and ensemble approaches with MAE, RMSE, and MAPE comparisons.",
+      "Added advanced analysis using Isolation Forest anomaly detection, feature-importance interpretation, and weather-air-quality correlation checks for deeper insight.",
+      "Built geospatial temperature pattern visualizations to surface global and regional trends beyond standard tabular summaries.",
     ],
-    frameworks: ["Flask", "Flask-CORS", "MongoDB", "PyMongo", "Docker", "pdfplumber", "REST API", "Data Ingestion"],
-    projectUrl: "https://csgit.ucalgary.ca/jashan.bhinder/seng513-202601-pg-17.git",
-    projectUrlLabel: "Open Repository",
-    liveUrl: "https://macrofinder-remix.onrender.com/",
+    frameworks: ["Python", "pandas", "NumPy", "scikit-learn", "Plotly", "Jupyter", "matplotlib", "seaborn", "Isolation Forest"],
+    projectUrl: "https://github.com/Vincent-Shin/tech-assessment-data-scientist-pm.git",
+    projectUrlLabel: "Open GitHub Project",
+  },
+  "project-macrofinder-system": {
+    background:
+      "Built and integrated MacroFinder as a full-stack nutrition and price comparison platform, covering data ingestion, MongoDB schema design, backend APIs, frontend integration, and cloud deployment.",
+    bullets: [
+      "Implemented Flask and MongoDB backend workflows for normalized restaurant-item persistence, deterministic de-duplication, and price-aware querying.",
+      "Integrated scraper/import pipelines to convert heterogeneous nutrition and menu sources into a consistent data model used by the live product.",
+      "Connected frontend flows for search, ranking, meal comparison, and role-based owner/admin updates through validated REST endpoints.",
+      "Packaged local execution with Docker Compose and supported cloud delivery through Render with environment-based configuration.",
+    ],
+    frameworks: ["Flask", "Flask-CORS", "MongoDB", "PyMongo", "React", "React Router", "Docker", "REST API", "Data Ingestion"],
+    projectUrl: "https://github.com/Vincent-Shin/marcofinder.git",
+    projectUrlLabel: "Open GitHub Project",
+    liveUrl: "https://macrofinder-remix.onrender.com",
     liveUrlLabel: "Website Live",
+  },
+  "project-job-assistant-agent": {
+    background:
+      "Built a three-week AI engineering MVP focused on resume-to-JD matching, structured answer generation, and job-application workflow support through a backend-first API system.",
+    bullets: [
+      "Implemented FastAPI endpoints for user profiles, resume analysis, resume-file parsing, application creation/listing, autofill preview, and health checks.",
+      "Built an agent pipeline that combines prompt templates, structured JSON schema validation, and deterministic fallback scoring when model providers fail.",
+      "Added job-description extraction flows with httpx and BeautifulSoup for LinkedIn, Greenhouse, Lever, and generic job pages with blocked-site handling.",
+      "Created automated pytest coverage for endpoints, parsing behavior, fallback logic, and scoring workflows to stabilize MVP reliability.",
+    ],
+    frameworks: ["Python", "FastAPI", "SQLite", "Pydantic", "httpx", "BeautifulSoup", "pytest", "Docker", "Swagger/OpenAPI"],
+    projectUrl: "https://github.com/Vincent-Shin/job-assistant-agent.git",
+    projectUrlLabel: "Open GitHub Project",
   },
   "project-jp-morgan-chase-virtual-experience": {
     background:
@@ -291,7 +337,9 @@ const projectDetailsById = {
 
 const projectMetaById = {
   "project-car-sales-revenue": "Machine Learning Project | December 2025",
-  "project-data-ingestion-backend-system": "Backend Data Platform | February 2026",
+  "project-weather-trend-forecasting-assessment": "Forecasting Assessment | April 2026",
+  "project-macrofinder-system": "Full-stack Nutrition Platform | April 2026",
+  "project-job-assistant-agent": "AI Agent Backend | April 2026",
   "project-jp-morgan-chase-virtual-experience": "Backend Simulation | January 2026",
   "project-backend-job-market-simulation-system": "Simulation Backend | February 2026",
   "project-movie-ticket-reservation-system": "Reservation Platform | April 2025",
@@ -343,7 +391,7 @@ const resumeVariants = [
     title: "Backend Engineering Resume",
     projects: [
       {
-        name: "Data Ingestion & Backend System",
+        name: "MacroFinder",
         course: "Web-Based Systems Course",
         date: "February 2026",
         bullets: [
@@ -388,7 +436,7 @@ const resumeVariants = [
         ],
       },
       {
-        name: "Data Ingestion & Backend System",
+        name: "MacroFinder",
         course: "Web-Based Systems Course",
         date: "February 2026",
         bullets: [
@@ -422,7 +470,7 @@ const resumeVariants = [
         ],
       },
       {
-        name: "Data Ingestion & Backend System",
+        name: "MacroFinder",
         course: "Web-Based Systems Course",
         date: "February 2026",
         bullets: [
@@ -594,7 +642,9 @@ const projectDisplayOrder = [
   "project-portfolio-website-system",
   "project-car-sales-revenue",
   "project-backend-job-market-simulation-system",
-  "project-data-ingestion-backend-system",
+  "project-weather-trend-forecasting-assessment",
+  "project-macrofinder-system",
+  "project-job-assistant-agent",
   "project-jp-morgan-chase-virtual-experience",
   "project-java-web-quality-engineering-system",
   "project-embedded-systems-control-project",
@@ -798,7 +848,7 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
   const query = normalizeText(message);
   const toneLead = isDark ? "Honestly, " : "";
   const backendProjects = [
-    "Data Ingestion & Backend System",
+    "MacroFinder",
     "Backend Job-Market Simulation System",
     "JP Morgan Chase Virtual Experience",
   ];
@@ -898,8 +948,8 @@ function getPortfolioAssistantReply(message: string, isDark: boolean) {
 
   if (query.includes("machine learning") || query.includes("ml") || query.includes("ai") || query.includes("data")) {
     return isDark
-      ? `${toneLead}the clearest ML and data signal is Predicting Car Sales Revenue. It shows a reproducible scikit-learn pipeline, feature engineering, regression benchmarking, and model packaging over 500K+ rows. Data Ingestion & Backend System adds a more backend-data angle through normalization and API delivery.`
-      : "The clearest ML and data work is Predicting Car Sales Revenue, which uses a reproducible scikit-learn pipeline, feature engineering, regression benchmarking, and serialized model packaging over 500K+ rows. Data Ingestion & Backend System also shows ETL-style normalization and API delivery.";
+      ? `${toneLead}the clearest ML and data signal is Predicting Car Sales Revenue. It shows a reproducible scikit-learn pipeline, feature engineering, regression benchmarking, and model packaging over 500K+ rows. Weather Trend Forecasting Assessment adds deeper forecasting analytics, while MacroFinder shows production-style ingestion and API delivery.`
+      : "The clearest ML and data work is Predicting Car Sales Revenue, which uses a reproducible scikit-learn pipeline, feature engineering, regression benchmarking, and serialized model packaging over 500K+ rows. Weather Trend Forecasting Assessment strengthens forecasting and anomaly analysis, while MacroFinder shows ETL-style normalization and API delivery.";
   }
 
   if (query.includes("education") || query.includes("school") || query.includes("degree")) {
@@ -1481,7 +1531,7 @@ export default function App() {
 
     const assistantReply = await requestPortfolioAssistantReply(message, isDark, [...chatMessages, userMessage], chatContext);
     setChatMode(assistantReply.source);
-    setLiveProviderLabel(assistantReply.providerLabel ? `Live AI · ${assistantReply.providerLabel}` : "Live AI");
+    setLiveProviderLabel(assistantReply.providerLabel ? `Live AI Â· ${assistantReply.providerLabel}` : "Live AI");
     if (assistantReply.source === "fallback") {
       void trackPortfolioEvent("fallback_question", {
         question: message,
@@ -2691,6 +2741,11 @@ export default function App() {
     </div>
   );
 }
+
+
+
+
+
 
 
 
