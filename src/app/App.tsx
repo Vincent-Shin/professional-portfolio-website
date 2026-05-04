@@ -39,7 +39,7 @@ const projectCards = [
   {
     id: "project-car-sales-revenue",
     title: "Predicting Car Sales Revenue",
-    meta: "ENSF 444 ï¿½ Machine Learning System ï¿½ December 2025",
+    meta: "ENSF 444 - Machine Learning System - December 2025",
     summary:
       "Revenue forecasting system built on 500,000+ records with reproducible preprocessing, feature engineering, and regression benchmarking.",
     stack: ["Python", "pandas", "NumPy", "scikit-learn", "joblib"],
@@ -49,7 +49,7 @@ const projectCards = [
   {
     id: "project-weather-trend-forecasting-assessment",
     title: "Weather Trend Forecasting Assessment",
-    meta: "Data Science Forecasting Project ï¿½ April 2026",
+    meta: "Data Science Forecasting Project - April 2026",
     summary:
       "Global weather forecasting assessment with time-series feature engineering, anomaly detection, model benchmarking, and geospatial analysis.",
     stack: ["Python", "pandas", "scikit-learn", "Plotly", "Jupyter"],
@@ -59,7 +59,7 @@ const projectCards = [
   {
     id: "project-macrofinder-system",
     title: "MacroFinder",
-    meta: "SENG 513 ï¿½ April 2026",
+    meta: "SENG 513 - April 2026",
     summary:
       "Full-stack restaurant nutrition comparison platform with ingestion pipelines, normalized MongoDB data, role-based workflows, and deployed web delivery.",
     stack: ["Python", "Flask", "MongoDB", "React", "Docker"],
@@ -69,7 +69,7 @@ const projectCards = [
   {
     id: "project-job-assistant-agent",
     title: "Job Assistant Agent",
-    meta: "AI Backend and Data Science Agent System ï¿½ April 2026",
+    meta: "AI Backend and Data Science Agent System - April 2026",
     summary:
       "AI-assisted job application backend that supports resume parsing, JD matching, tailored answer generation, and application tracking through FastAPI.",
     stack: ["Python", "FastAPI", "SQLite", "pytest", "Docker"],
@@ -79,7 +79,7 @@ const projectCards = [
   {
     id: "project-jp-morgan-chase-virtual-experience",
     title: "JP Morgan Chase Virtual Experience",
-    meta: "Certificate / Simulation ï¿½ January 2026",
+    meta: "Certificate / Simulation - January 2026",
     summary:
       "Spring Boot transaction-processing simulation with persistence, balance retrieval, and Kafka-based event-ingestion scaffolding.",
     stack: ["Java", "Spring Boot", "Spring Data JPA", "Kafka", "H2"],
@@ -89,7 +89,7 @@ const projectCards = [
   {
     id: "project-backend-job-market-simulation-system",
     title: "Backend Job-Market Simulation System",
-    meta: "SENG 401 ï¿½ February 2026",
+    meta: "SENG 401 - February 2026",
     summary:
       "Service-layer backend for a job-market simulation game with persistent player state, progression logic, and application outcomes.",
     stack: ["Python", "Flask", "SQLAlchemy", "SQLite", "REST API"],
@@ -99,7 +99,7 @@ const projectCards = [
   {
     id: "project-movie-ticket-reservation-system",
     title: "Movie Ticket Reservation System",
-    meta: "ENSF 480 ï¿½ April 2025",
+    meta: "ENSF 480 - April 2025",
     summary:
       "Java reservation platform with relational persistence, booking workflows, receipt generation, and cancellation rule enforcement.",
     stack: ["Java", "JDBC", "MySQL", "SQL", "Swing"],
@@ -109,7 +109,7 @@ const projectCards = [
   {
     id: "project-java-web-quality-engineering-system",
     title: "Java Web Quality Engineering System",
-    meta: "ENSF 400 ï¿½ December 2025",
+    meta: "ENSF 400 - December 2025",
     summary:
       "Multi-module Java web application emphasizing quality engineering through automated testing, CI/CD, migration tooling, and validation.",
     stack: ["Java", "Servlets", "Tomcat", "JUnit", "Jenkins"],
@@ -129,7 +129,7 @@ const projectCards = [
   {
     id: "project-jfreechart-testing-project",
     title: "JFreeChart Testing Project",
-    meta: "Testing Project ï¿½ April 2025",
+    meta: "Testing Project - April 2025",
     summary:
       "White-box test suite expansion for core JFreeChart utility classes covering boundary conditions, exceptions, and mock-based isolation.",
     stack: ["Java", "JUnit", "JMock", "White-box Testing"],
@@ -139,7 +139,7 @@ const projectCards = [
   {
     id: "project-embedded-systems-control-project",
     title: "Embedded Systems Control Project",
-    meta: "PIC24F16KA101 ï¿½ December 2025",
+    meta: "PIC24F16KA101 - December 2025",
     summary:
       "Interrupt-driven embedded firmware integrating change notification interrupts, timer-based LED control, UART output, and idle-mode execution.",
     stack: ["Embedded C", "PIC24", "UART", "Timer Interrupts"],
@@ -149,7 +149,7 @@ const projectCards = [
   {
     id: "project-calgary-hackathon-arena-system",
     title: "Calgary Hackathon Arena System",
-    meta: "Hackathon Project ï¿½ February 2026",
+    meta: "Hackathon Project - February 2026",
     summary:
       "Godot-based arena and progression system with centralized game state, scene transitions, spawning logic, and meta-upgrade flow.",
     stack: ["Godot", "GDScript", "Game State", "Scene Systems"],
@@ -392,31 +392,31 @@ const resumeVariants = [
     projects: [
       {
         name: "MacroFinder",
-        course: "Web-Based Systems Course",
-        date: "February 2026",
+        course: "SENG 513",
+        date: "April 2026",
         bullets: [
-          "Engineered a Flask and MongoDB backend by exposing REST APIs for ingestion, validation, and structured retrieval, improving consistency across multi-source restaurant datasets.",
-          "Implemented unique-key deduplication with normalized persistence logic, reducing record conflicts across heterogeneous data sources.",
-          "Containerized backend services with Docker and Docker Compose, creating reproducible development and testing environments for backend delivery.",
+          "Built and integrated a Flask plus MongoDB backend with validation-first REST APIs for menu ingestion, retrieval, ranking support, and role-based workflows.",
+          "Implemented deterministic unique-key deduplication and normalized document persistence to prevent duplicate writes across heterogeneous restaurant sources.",
+          "Containerized backend, frontend, and database services with Docker Compose, then supported cloud deployment through environment-driven configuration.",
         ],
       },
       {
         name: "Backend Job-Market Simulation System",
-        course: "Software Architecture Course",
+        course: "SENG 401",
         date: "February 2026",
         bullets: [
-          "Architected a Flask and SQLAlchemy backend by modeling player progression, application history, and hiring outcomes in a relational database.",
-          "Designed REST APIs for lifecycle management, score updates, and application retrieval, enabling persistent synchronization across gameplay systems.",
-          "Implemented rule-based hiring logic with score thresholds and progression constraints, turning gameplay decisions into deterministic backend outcomes.",
+          "Architected a Flask and SQLAlchemy backend that models player progression, application history, and hiring outcomes in a relational schema.",
+          "Designed lifecycle and state-mutation APIs for score updates, stage transitions, activity completion, and application retrieval.",
+          "Implemented rule-based hiring decisions with score thresholds, stage prerequisites, and fail-state constraints to keep progression deterministic.",
         ],
       },
       {
-        name: "JP Morgan Chase Virtual Experience",
-        course: "Advanced Software Engineering Simulation",
-        date: "January 2026",
+        name: "Job Assistant Agent",
+        course: "AI Backend Project",
+        date: "April 2026",
         bullets: [
-          "Developed Spring Boot backend services with JPA-backed persistence and REST balance retrieval, establishing the foundation for transaction-processing workflows.",
-          "Integrated Kafka-oriented transaction scaffolding with repository-backed data access, supporting asynchronous event-driven service architecture.",
+          "Developed FastAPI services for resume scoring, tailored answer generation, application tracking, and health checks with SQLite persistence.",
+          "Implemented provider fallback and structured JSON validation so resume-to-JD analysis remains stable under external provider failures or limits.",
         ],
       },
     ],
@@ -426,31 +426,31 @@ const resumeVariants = [
     title: "Data Scientist Resume",
     projects: [
       {
+        name: "Weather Trend Forecasting Assessment",
+        course: "Data Science Assessment",
+        date: "April 2026",
+        bullets: [
+          "Built an end-to-end forecasting workflow on 136K+ global weather records with cleaning, lag feature engineering, and multi-model benchmarking.",
+          "Compared Naive, Linear Regression, Random Forest, and ensemble approaches using MAE, RMSE, and MAPE for robust model selection.",
+          "Added anomaly detection, feature-importance analysis, and geospatial pattern exploration to support deeper environmental insight generation.",
+        ],
+      },
+      {
         name: "Predicting Car Sales Revenue",
-        course: "Machine Learning System Course",
+        course: "ENSF 444",
         date: "December 2025",
         bullets: [
-          "Built an end-to-end regression pipeline using pandas, NumPy, and scikit-learn, enabling revenue prediction from a dataset exceeding 500K records.",
-          "Engineered 15+ predictive features through temporal extraction and correlation analysis, strengthening model quality across multiple regression benchmarks.",
-          "Evaluated model performance with RMSE, MAE, and R-squared metrics, supporting data-driven model selection before serialized deployment.",
+          "Engineered and validated a regression workflow on a 500K+ row dataset with typed preprocessing, feature engineering, and controlled experimentation.",
+          "Achieved an R-squared score of 0.91 while maintaining reproducible training and evaluation boundaries that prevent data leakage.",
         ],
       },
       {
         name: "MacroFinder",
-        course: "Web-Based Systems Course",
-        date: "February 2026",
+        course: "SENG 513",
+        date: "April 2026",
         bullets: [
-          "Designed ETL-style ingestion workflows by normalizing restaurant item data from multiple heterogeneous sources, improving downstream consistency for analysis and retrieval.",
-          "Implemented parsing, matching, and price-enrichment logic across JSON, HTML, and PDF-like sources, increasing usability of collected data for analytics workflows.",
-        ],
-      },
-      {
-        name: "JP Morgan Chase Virtual Experience",
-        course: "Advanced Software Engineering Simulation",
-        date: "January 2026",
-        bullets: [
-          "Worked with Spring Boot, Kafka, and persisted account data in a transaction-processing simulation, extending my understanding of structured financial data flows.",
-          "Applied repository-backed access patterns and event-driven processing concepts that complement analytics and data-platform thinking.",
+          "Designed ingestion and normalization workflows that converted scraped restaurant nutrition data into analysis-ready records.",
+          "Built ranking features from price and macro fields to support practical comparison metrics and decision-focused data presentation.",
         ],
       },
     ],
@@ -460,31 +460,31 @@ const resumeVariants = [
     title: "AI Engineering Resume",
     projects: [
       {
+        name: "Job Assistant Agent",
+        course: "AI Backend Project",
+        date: "April 2026",
+        bullets: [
+          "Built an AI-assisted FastAPI platform for resume-to-JD scoring, tailored answer generation, and application workflow tracking.",
+          "Implemented prompt templates, structured JSON parsing, and schema validation with deterministic fallback logic for reliability under rate limits.",
+          "Added document parsing for PDF, DOCX, TXT, and Markdown inputs to unify file-based and text-based analysis flows.",
+        ],
+      },
+      {
         name: "Predicting Car Sales Revenue",
-        course: "Machine Learning System Course",
+        course: "ENSF 444",
         date: "December 2025",
         bullets: [
-          "Developed an end-to-end machine learning pipeline in Python using pandas, NumPy, and scikit-learn, enabling revenue prediction from raw vehicle and sales data.",
-          "Built preprocessing pipelines with StandardScaler and OneHotEncoder to create consistent training and inference workflows for mixed-type features.",
-          "Serialized the final preprocessing-and-model artifact with joblib after controlled experimentation, achieving an R-squared score of 0.91 on unseen data.",
+          "Developed an end-to-end ML pipeline with standardized preprocessing, feature engineering, and comparative regression benchmarking.",
+          "Packaged the final preprocessing-plus-model workflow as a reusable artifact for consistent inference execution.",
         ],
       },
       {
-        name: "MacroFinder",
-        course: "Web-Based Systems Course",
-        date: "February 2026",
+        name: "Weather Trend Forecasting Assessment",
+        course: "Data Science Assessment",
+        date: "April 2026",
         bullets: [
-          "Constructed data ingestion workflows by combining scraping, parsing, validation, and persistence steps across multiple external content sources.",
-          "Implemented normalization and matching logic across structured and semi-structured documents, improving downstream reliability for data enrichment tasks.",
-        ],
-      },
-      {
-        name: "JP Morgan Chase Virtual Experience",
-        course: "Advanced Software Engineering Simulation",
-        date: "January 2026",
-        bullets: [
-          "Worked within a Spring Boot and Kafka-based transaction simulation, reinforcing the system patterns often used around AI-enabled and event-driven platforms.",
-          "Applied persistence and message-driven service concepts that map well to production-facing inference and data orchestration systems.",
+          "Engineered lag-based time-series features and model-comparison workflows for forecast optimization on global weather observations.",
+          "Integrated anomaly detection and feature-importance analysis to improve interpretability and model-trust discussions.",
         ],
       },
     ],
@@ -494,37 +494,37 @@ const resumeVariants = [
     title: "Software Engineering Resume",
     projects: [
       {
-        name: "Backend Job-Market Simulation System",
-        course: "Software Architecture Course",
-        date: "February 2026",
+        name: "MacroFinder",
+        course: "SENG 513",
+        date: "April 2026",
         bullets: [
-          "Architected a Flask and SQLAlchemy service layer for a job-market simulation, persisting player state, stage progression, and application outcomes in a relational backend.",
-          "Designed REST endpoints for score updates, application tracking, stage transitions, and run resets, enabling clean synchronization between gameplay logic and backend state.",
-          "Implemented rule-based hiring decisions using score thresholds, progression constraints, and probability modifiers, turning product rules into deterministic backend behavior.",
+          "Delivered a full-stack web platform with React, Flask, and MongoDB for restaurant nutrition and price comparison workflows.",
+          "Implemented backend validation, data normalization, frontend integration, and role-based owner/admin flows in one production-style system.",
+          "Supported Docker-based local execution and cloud deployment configuration for consistent build and runtime behavior.",
         ],
       },
       {
-        name: "Movie Ticket Reservation System",
-        course: "Software Design Course",
-        date: "April 2025",
+        name: "Backend Job-Market Simulation System",
+        course: "SENG 401",
+        date: "February 2026",
         bullets: [
-          "Built a Java, JDBC, and MySQL reservation platform that coordinated bookings, ticket persistence, receipt generation, and cancellation rules across a multi-entity database model.",
-          "Connected UI actions, business rules, and SQL operations through structured object-oriented design, improving reliability across end-to-end reservation workflows.",
+          "Engineered a modular backend service layer with Flask and SQLAlchemy to manage simulation state, rules, and progression events.",
+          "Designed REST endpoints for score transitions, activity completion, and application outcomes with persistent relational storage.",
+          "Applied deterministic rule enforcement for stage gates and hiring outcomes to ensure reproducible system behavior.",
         ],
       },
       {
         name: "Java Web Quality Engineering System",
-        course: "Quality Engineering Course",
+        course: "ENSF 400",
         date: "December 2025",
         bullets: [
-          "Worked within a multi-module Java web system using Servlets, Tomcat, H2, and Flyway, reinforcing maintainable web architecture and database-backed service structure.",
-          "Applied JUnit, Selenium, Cucumber, Jenkins, and SonarQube workflows to strengthen validation discipline, delivery confidence, and software quality practices.",
+          "Contributed to a multi-module Java web application using Servlets, Tomcat, H2, and Flyway with strong quality-engineering practices.",
+          "Applied JUnit, Mockito, Cucumber, Selenium, Jenkins, and SonarQube workflows for maintainability, test depth, and CI discipline.",
         ],
       },
     ],
   },
 ];
-
 const resumePdfByKey = {
   backend: assetPath("/resumes/backend-resume.pdf"),
   ai: assetPath("/resumes/ai-engineering-resume.pdf"),
@@ -1531,7 +1531,7 @@ export default function App() {
 
     const assistantReply = await requestPortfolioAssistantReply(message, isDark, [...chatMessages, userMessage], chatContext);
     setChatMode(assistantReply.source);
-    setLiveProviderLabel(assistantReply.providerLabel ? `Live AI Â· ${assistantReply.providerLabel}` : "Live AI");
+    setLiveProviderLabel(assistantReply.providerLabel ? `Live AI - ${assistantReply.providerLabel}` : "Live AI");
     if (assistantReply.source === "fallback") {
       void trackPortfolioEvent("fallback_question", {
         question: message,
@@ -2741,6 +2741,7 @@ export default function App() {
     </div>
   );
 }
+
 
 
 
