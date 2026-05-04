@@ -19,9 +19,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 const assetPath = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
 
 const navItems = [
-  { label: "About Me", href: "#about" },
-  { label: "Resume", href: "#resume" },
-  { label: "Projects", href: "#projects" },
+  { label: "About Me", href: "#about" },`r`n  { label: "Projects", href: "#projects" },`r`n  { label: "Resume", href: "#resume" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -1849,6 +1847,106 @@ export default function App() {
             </div>
           </section>
 
+          <section id="projects" className="scroll-mt-28">
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-[clamp(2.2rem,4.8vw,4rem)] tracking-[-0.04em]">Featured Engineering Projects</h2>
+                <p className={cx("mt-4 max-w-3xl text-base leading-7", mutedTextClass)}>
+                  A compact project view with four projects per page. Open any card to see the full background, highlights, frameworks, and project access details.
+                </p>
+              </div>
+
+              <div className="grid gap-5 lg:grid-cols-2">
+                {pagedProjects.map((project) => (
+                  <article
+                    id={project.id}
+                    key={project.title}
+                    className={cx(
+                      "rounded-[26px] border p-5 scroll-mt-28 transition-colors duration-500 sm:p-6",
+                      surfaceClass,
+                      selectedProjectId === project.id && (isDark ? "border-cyan-400/30" : "border-black/20"),
+                    )}
+                  >
+                    <div className={cx("mb-5 overflow-hidden rounded-[22px] border", isDark ? "border-white/10 bg-[linear-gradient(135deg,#18212c,#0f141b)]" : "border-black/10 bg-[linear-gradient(135deg,#f4f1eb,#e8e3d8)]")}>
+                      {project.imageSrc && (
+                        <>
+                          <div className="aspect-[16/10]">
+                            <img src={project.imageSrc} alt={project.title} className="h-full w-full object-cover" />
+                          </div>
+                        </>
+                      )}
+                      {!project.imageSrc && <div className="aspect-[16/10]" />}
+                      <div className="px-5 pb-5 pt-4">
+                        <p className={cx("text-[11px] uppercase tracking-[0.28em]", softTextClass)}>Project Snapshot</p>
+                        <p className="mt-2 text-lg tracking-[-0.02em]">{project.imageLabel}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <p className={cx("text-xs uppercase tracking-[0.24em]", softTextClass)}>
+                          {projectMetaById[project.id as keyof typeof projectMetaById]}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => openProjectModal(project.id)}
+                          className={cx("mt-2 text-left text-2xl tracking-[-0.03em] transition-colors", isDark ? "hover:text-cyan-200" : "hover:text-black")}
+                        >
+                          {project.title}
+                        </button>
+                      </div>
+                      <p className={cx("text-sm leading-7", mutedTextClass)}>{project.summary}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {project.stack.map((item) => (
+                          <span key={item} className={cx("rounded-full border px-3 py-1 text-xs", isDark ? "border-white/10 bg-white/[0.03] text-white/72" : "border-black/10 text-black/68")}>
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => openProjectModal(project.id)}
+                        className={cx("inline-flex rounded-full border px-4 py-2 text-sm transition-colors", actionClass)}
+                      >
+                        View details
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between gap-4">
+                <p className={cx("text-sm", mutedTextClass)}>
+                  Page {projectPage + 1} of {projectPageCount}
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setProjectPage((page) => Math.max(0, page - 1))}
+                    disabled={projectPage === 0}
+                    className={cx(
+                      "rounded-full border px-4 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+                      actionClass,
+                    )}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setProjectPage((page) => Math.min(projectPageCount - 1, page + 1))}
+                    disabled={projectPage === projectPageCount - 1}
+                    className={cx(
+                      "rounded-full border px-4 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+                      actionClass,
+                    )}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </section>
+
           <section id="resume" className="scroll-mt-28">
             <div className="space-y-8">
               <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -1991,106 +2089,6 @@ export default function App() {
                   </div>
                 </div>
               </div>
-            </div>
-          </section>
-
-          <section id="projects" className="scroll-mt-28">
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-[clamp(2.2rem,4.8vw,4rem)] tracking-[-0.04em]">Featured Engineering Projects</h2>
-                <p className={cx("mt-4 max-w-3xl text-base leading-7", mutedTextClass)}>
-                  A compact project view with four projects per page. Open any card to see the full background, highlights, frameworks, and project access details.
-                </p>
-              </div>
-
-              <div className="grid gap-5 lg:grid-cols-2">
-                {pagedProjects.map((project) => (
-                  <article
-                    id={project.id}
-                    key={project.title}
-                    className={cx(
-                      "rounded-[26px] border p-5 scroll-mt-28 transition-colors duration-500 sm:p-6",
-                      surfaceClass,
-                      selectedProjectId === project.id && (isDark ? "border-cyan-400/30" : "border-black/20"),
-                    )}
-                  >
-                    <div className={cx("mb-5 overflow-hidden rounded-[22px] border", isDark ? "border-white/10 bg-[linear-gradient(135deg,#18212c,#0f141b)]" : "border-black/10 bg-[linear-gradient(135deg,#f4f1eb,#e8e3d8)]")}>
-                      {project.imageSrc && (
-                        <>
-                          <div className="aspect-[16/10]">
-                            <img src={project.imageSrc} alt={project.title} className="h-full w-full object-cover" />
-                          </div>
-                        </>
-                      )}
-                      {!project.imageSrc && <div className="aspect-[16/10]" />}
-                      <div className="px-5 pb-5 pt-4">
-                        <p className={cx("text-[11px] uppercase tracking-[0.28em]", softTextClass)}>Project Snapshot</p>
-                        <p className="mt-2 text-lg tracking-[-0.02em]">{project.imageLabel}</p>
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      <div>
-                        <p className={cx("text-xs uppercase tracking-[0.24em]", softTextClass)}>
-                          {projectMetaById[project.id as keyof typeof projectMetaById]}
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => openProjectModal(project.id)}
-                          className={cx("mt-2 text-left text-2xl tracking-[-0.03em] transition-colors", isDark ? "hover:text-cyan-200" : "hover:text-black")}
-                        >
-                          {project.title}
-                        </button>
-                      </div>
-                      <p className={cx("text-sm leading-7", mutedTextClass)}>{project.summary}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {project.stack.map((item) => (
-                          <span key={item} className={cx("rounded-full border px-3 py-1 text-xs", isDark ? "border-white/10 bg-white/[0.03] text-white/72" : "border-black/10 text-black/68")}>
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => openProjectModal(project.id)}
-                        className={cx("inline-flex rounded-full border px-4 py-2 text-sm transition-colors", actionClass)}
-                      >
-                        View details
-                      </button>
-                    </div>
-                  </article>
-                ))}
-              </div>
-
-              <div className="flex items-center justify-between gap-4">
-                <p className={cx("text-sm", mutedTextClass)}>
-                  Page {projectPage + 1} of {projectPageCount}
-                </p>
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setProjectPage((page) => Math.max(0, page - 1))}
-                    disabled={projectPage === 0}
-                    className={cx(
-                      "rounded-full border px-4 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40",
-                      actionClass,
-                    )}
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setProjectPage((page) => Math.min(projectPageCount - 1, page + 1))}
-                    disabled={projectPage === projectPageCount - 1}
-                    className={cx(
-                      "rounded-full border px-4 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40",
-                      actionClass,
-                    )}
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-
             </div>
           </section>
 
