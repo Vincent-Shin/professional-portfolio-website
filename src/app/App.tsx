@@ -19,7 +19,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 const assetPath = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
 
 const navItems = [
-  { label: "About Me", href: "#about" },`r`n  { label: "Projects", href: "#projects" },`r`n  { label: "Resume", href: "#resume" },
+  { label: "About Me", href: "#about" },
+  { label: "Projects", href: "#projects" },
+  { label: "Resume", href: "#resume" },
   { label: "Contact", href: "#contact" },
 ];
 
