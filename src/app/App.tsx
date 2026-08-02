@@ -330,7 +330,7 @@ const projectDetailsById = {
       "Refined layout hierarchy, sidebar state, and CTA flows as product-level interaction decisions rather than treating the site as a static frontend mockup.",
     ],
     frameworks: ["React", "TypeScript", "Vite", "Tailwind CSS", "Lucide React", "Responsive UI", "UI Content Strategy", "Interaction Design", "Portfolio Information Architecture"],
-    projectUrl: "https://github.com/Vincent-Shin/professional-portfolio-website",
+    projectUrl: "https://github.com/Vincent-Shin/portfolio",
     projectUrlLabel: "Open GitHub Project",
   },
 } as const;

@@ -2,7 +2,7 @@
 
 Recruiter-facing portfolio platform built with React, TypeScript, and Vite, with a production chatbot backend on Cloudflare Workers.
 
-Live website: `https://vincent-shin.github.io/professional-portfolio-website/`
+Live website: `https://vincent-shin.github.io/portfolio/`
 
 ## Overview
 
@@ -45,7 +45,7 @@ The site is deployed as a static frontend on GitHub Pages and connects to a Clou
 
 ## Live Endpoints
 
-- Frontend: `https://vincent-shin.github.io/professional-portfolio-website/`
+- Frontend: `https://vincent-shin.github.io/portfolio/`
 - Worker health: `https://vincent-portfolio-chatbot.vincentmai-portfolio.workers.dev/health`
 
 ## Repository Structure
