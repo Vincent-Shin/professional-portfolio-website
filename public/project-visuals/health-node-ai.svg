@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1591" height="862" viewBox="0 0 1591 862" role="img" aria-label="My Health Node AI website hero screenshot">
+  <defs>
+    <radialGradient id="mintGlow" cx="72%" cy="45%" r="42%">
+      <stop offset="0%" stop-color="#dffaf8"/>
+      <stop offset="54%" stop-color="#eefcfb"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </radialGradient>
+    <linearGradient id="nodeFill" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#94dcd7"/>
+      <stop offset="1" stop-color="#0d6467"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#174c4e" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <rect width="1591" height="862" fill="#ffffff"/>
+  <rect y="60" width="1591" height="802" fill="url(#mintGlow)"/>
+  <g font-family="Inter, Arial, sans-serif">
+    <line x1="0" y1="60" x2="1591" y2="60" stroke="#eef1f4"/>
+    <g transform="translate(208 17)">
+      <circle cx="20" cy="12" r="6" fill="#0ba39a"/>
+      <circle cx="20" cy="34" r="6" fill="#0ba39a"/>
+      <circle cx="8" cy="23" r="6" fill="#0ba39a"/>
+      <circle cx="32" cy="23" r="6" fill="#0ba39a"/>
+      <line x1="20" y1="12" x2="20" y2="34" stroke="#0ba39a" stroke-width="6"/>
+      <line x1="8" y1="23" x2="32" y2="23" stroke="#0ba39a" stroke-width="6"/>
+      <text x="45" y="31" fill="#202633" font-size="14" font-weight="800">My Health Node <tspan fill="#0ba39a">AI</tspan></text>
+    </g>
+    <text x="557" y="32" fill="#64748b" font-size="14" font-weight="700">Features</text>
+    <text x="647" y="32" fill="#64748b" font-size="14" font-weight="700">How it works</text>
+    <text x="764" y="32" fill="#64748b" font-size="14" font-weight="700">For Caregivers</text>
+    <text x="891" y="32" fill="#64748b" font-size="14" font-weight="700">Pricing</text>
+    <rect x="1123" y="10" width="78" height="38" rx="9" fill="#ffffff" stroke="#dfe7ee"/>
+    <text x="1145" y="33" fill="#006f69" font-size="14">Login</text>
+    <rect x="1211" y="10" width="85" height="37" rx="10" fill="#00a394"/>
+    <text x="1230" y="33" fill="#ffffff" font-size="14" font-weight="800">Sign Up</text>
+    <circle cx="1545" cy="192" r="145" fill="#b9efeb" opacity="0.55"/>
+    <g stroke="#20a69f" stroke-width="1.1" opacity="0.62">
+      <line x1="186" y1="862" x2="1148" y2="175"/>
+      <line x1="214" y1="862" x2="1162" y2="188"/>
+      <line x1="241" y1="862" x2="1175" y2="202"/>
+      <line x1="268" y1="862" x2="1189" y2="216"/>
+      <line x1="295" y1="862" x2="1202" y2="230"/>
+      <line x1="322" y1="862" x2="1216" y2="244"/>
+      <line x1="349" y1="862" x2="1229" y2="258"/>
+      <line x1="376" y1="862" x2="1243" y2="272"/>
+    </g>
+    <g fill="#0ba39a" opacity="0.25">
+      <circle cx="1520" cy="99" r="2.2"/><circle cx="1533" cy="99" r="2.2"/><circle cx="1546" cy="99" r="2.2"/><circle cx="1559" cy="99" r="2.2"/><circle cx="1572" cy="99" r="2.2"/>
+      <circle cx="1520" cy="111" r="2.2"/><circle cx="1533" cy="111" r="2.2"/><circle cx="1546" cy="111" r="2.2"/><circle cx="1559" cy="111" r="2.2"/><circle cx="1572" cy="111" r="2.2"/>
+      <circle cx="1520" cy="123" r="2.2"/><circle cx="1533" cy="123" r="2.2"/><circle cx="1546" cy="123" r="2.2"/><circle cx="1559" cy="123" r="2.2"/><circle cx="1572" cy="123" r="2.2"/>
+      <circle cx="1520" cy="135" r="2.2"/><circle cx="1533" cy="135" r="2.2"/><circle cx="1546" cy="135" r="2.2"/><circle cx="1559" cy="135" r="2.2"/><circle cx="1572" cy="135" r="2.2"/>
+      <circle cx="1520" cy="147" r="2.2"/><circle cx="1533" cy="147" r="2.2"/><circle cx="1546" cy="147" r="2.2"/><circle cx="1559" cy="147" r="2.2"/><circle cx="1572" cy="147" r="2.2"/>
+    </g>
+    <text x="208" y="364" fill="#189d93" font-size="13" font-weight="800" letter-spacing="5">PERSONAL HEALTH COMMAND CENTER</text>
+    <text x="208" y="433" fill="#071625" font-size="60" font-weight="800">Smarter Care,</text>
+    <text x="208" y="500" fill="#071625" font-size="60" font-weight="800">Better <tspan fill="#3aa091">Connected</tspan></text>
+    <text x="208" y="554" fill="#6f7f8f" font-size="18">AI-powered care coordination that keeps patients,</text>
+    <text x="208" y="583" fill="#6f7f8f" font-size="18">caregivers, and providers connected.</text>
+    <rect x="208" y="633" width="155" height="48" rx="10" fill="#199b90" filter="url(#softShadow)"/>
+    <text x="236" y="663" fill="#ffffff" font-size="14" font-weight="800">Get started</text>
+    <path d="M320 657h12m-5-5 5 5-5 5" stroke="#ffffff" stroke-width="2" fill="none"/>
+    <rect x="379" y="632" width="132" height="49" rx="10" fill="#ffffff" stroke="#dfe7ee" filter="url(#softShadow)"/>
+    <text x="408" y="663" fill="#445164" font-size="14">Learn more</text>
+  </g>
+  <g transform="translate(812 202)" filter="url(#softShadow)">
+    <path d="M242 28c43 0 64 55 34 87l-30 32 44 15 46-24c44-23 89 24 64 67-15 26-47 38-75 25l-49-23-20 42 38 35c36 34 15 94-34 99-30 3-59-16-68-45l-16-51h-48l-16 51c-9 29-38 48-68 45-49-5-70-65-34-99l38-35-20-42-49 23c-28 13-60 1-75-25-25-43 20-90 64-67l46 24 44-15-30-32c-30-32-9-87 34-87 31 0 59 19 70 48l16 42h56l16-42c11-29 39-48 70-48z" fill="#1b5d61" opacity="0.35" transform="translate(-18 24)"/>
+    <path d="M242 28c43 0 64 55 34 87l-30 32 44 15 46-24c44-23 89 24 64 67-15 26-47 38-75 25l-49-23-20 42 38 35c36 34 15 94-34 99-30 3-59-16-68-45l-16-51h-48l-16 51c-9 29-38 48-68 45-49-5-70-65-34-99l38-35-20-42-49 23c-28 13-60 1-75-25-25-43 20-90 64-67l46 24 44-15-30-32c-30-32-9-87 34-87 31 0 59 19 70 48l16 42h56l16-42c11-29 39-48 70-48z" fill="url(#nodeFill)" stroke="#0e5960" stroke-width="2"/>
+    <g stroke="#e8fbfb" stroke-width="13" stroke-linecap="round">
+      <line x1="152" y1="178" x2="106" y2="136"/>
+      <line x1="152" y1="178" x2="92" y2="228"/>
+      <line x1="152" y1="178" x2="213" y2="135"/>
+      <line x1="152" y1="178" x2="225" y2="228"/>
+    </g>
+    <g fill="#eefafa">
+      <circle cx="103" cy="133" r="25"/><circle cx="88" cy="231" r="25"/><circle cx="215" cy="131" r="25"/><circle cx="229" cy="231" r="25"/>
+    </g>
+    <rect x="105" y="156" width="100" height="74" rx="11" fill="#c8eeee" stroke="#edfafa" stroke-width="8"/>
+    <rect x="135" y="132" width="41" height="122" rx="7" fill="#c8eeee"/>
+  </g>
+</svg>

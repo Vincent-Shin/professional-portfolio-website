@@ -17,6 +17,16 @@ export const portfolioProfile = {
   ],
   projects: [
     {
+      name: "SmartCD.ai",
+      summary:
+        "Fintech product work through The PM Accelerator using React, FastAPI, Supabase, OpenAI APIs, strategy simulation, Vercel, Render, pytest, and GitHub Actions.",
+    },
+    {
+      name: "Health Node AI",
+      summary:
+        "Backend-focused healthtech AI work through The PM Accelerator using FastAPI, Pydantic, SQLAlchemy/Alembic, PostgreSQL/Supabase, OpenRouter LLM APIs, OCR, and human-review validation.",
+    },
+    {
       name: "ML Revenue Forecasting",
       summary:
         "Revenue forecasting project built on 500,000+ rows with reproducible preprocessing, feature engineering, regression benchmarking, and model packaging.",

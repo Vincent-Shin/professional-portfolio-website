@@ -37,6 +37,26 @@ const projectCards = [
     imageSrc: assetPath("/project-visuals/01-portfolio.png"),
   },
   {
+    id: "project-smartcd-ai",
+    title: "SmartCD.ai",
+    meta: "The PM Accelerator - Software Engineering Internship - April 2026 to July 2026",
+    summary:
+      "Fintech web application for comparing CDs, brokered CDs, and Treasuries by after-tax return with strategy simulation and AI-assisted explanations.",
+    stack: ["React", "FastAPI", "Supabase", "OpenAI API", "Vercel"],
+    imageLabel: "FinTech / AI Product",
+    imageSrc: assetPath("/project-visuals/smartcd-ai.svg"),
+  },
+  {
+    id: "project-healthbuddy-ai",
+    title: "Health Node AI",
+    meta: "The PM Accelerator - Software Engineering Internship - July 2026 to Present",
+    summary:
+      "Backend-focused healthtech AI workflow work for medication extraction, refill task management, schema migration, and human-review safeguards.",
+    stack: ["Python", "FastAPI", "PostgreSQL", "OpenRouter", "Alembic"],
+    imageLabel: "HealthTech / AI Backend",
+    imageSrc: assetPath("/project-visuals/health-node-ai.svg"),
+  },
+  {
     id: "project-car-sales-revenue",
     title: "Predicting Car Sales Revenue",
     meta: "ENSF 444 - Machine Learning System - December 2025",
@@ -159,6 +179,38 @@ const projectCards = [
 ];
 
 const projectDetailsById = {
+  "project-smartcd-ai": {
+    background:
+      "Contributed to SmartCD.ai through The PM Accelerator as a Software Engineering Intern, building fintech product workflows that compare CDs, brokered CDs, and Treasuries by realistic after-tax return rather than nominal APY alone.",
+    bullets: [
+      "Integrated React and Vite frontend workflows with FastAPI ranking and strategy endpoints, mapping user investment preferences into structured API requests and ranked product result cards.",
+      "Built Bullet, Barbell, and Ladder strategy experiences with allocation controls, maturity filtering, blended after-tax APY, compound-interest projections, and responsive result summaries.",
+      "Added backend strategy simulation and Bullet rate-risk capabilities through FastAPI endpoints with validation, caching, break-even calculations, and AI-ready summary payloads.",
+      "Integrated OpenAI-powered explanation and streaming chat flows while keeping deterministic ranking responses as the source of truth for financial calculations.",
+      "Improved production readiness through pytest coverage, GitHub Actions CI, Vercel frontend deployment, Render backend configuration, and active-offer filtering fixes.",
+    ],
+    frameworks: ["React", "Vite", "FastAPI", "Pydantic", "Supabase", "OpenAI Responses API", "pytest", "GitHub Actions", "Vercel", "Render", "Tailwind CSS"],
+    projectUrl: "https://github.com/Sylv1011/smart-cd-ai.git",
+    projectUrlLabel: "Open GitHub Project",
+    liveUrl: "https://www.smartcd.ai/",
+    liveUrlLabel: "Open Website",
+  },
+  "project-healthbuddy-ai": {
+    background:
+      "Contributed to HealthBuddy AI through The PM Accelerator as a backend-focused Software Engineering Intern, building AI-assisted healthcare workflow features for medication extraction, medication draft confirmation, refill tasks, and database schema evolution.",
+    bullets: [
+      "Implemented medication extraction backend logic with OpenRouter-compatible LLM APIs, strict JSON prompts, Pydantic schemas, confidence normalization, and provider error handling.",
+      "Built medication draft and confirmation flows that transform OCR and LLM output into reviewable medication data before database persistence.",
+      "Developed refill task APIs and service logic for caregiver workflows, including task creation, duplicate prevention, medication confirmation, status rules, and task completion.",
+      "Added Alembic migrations for healthcare workflow schema changes and worked across FastAPI, async SQLAlchemy, PostgreSQL/Supabase, Docker Compose, and pytest.",
+      "Framed AI output as untrusted healthcare data by validating, normalizing, assigning confidence labels, and routing uncertain extraction results to human review.",
+    ],
+    frameworks: ["Python", "FastAPI", "Pydantic", "SQLAlchemy async", "Alembic", "PostgreSQL", "Supabase", "OpenRouter", "Google Vision OCR", "pytest", "Docker Compose"],
+    projectUrl: "https://github.com/HealthBuddyAIORG/HealthBuddy.git",
+    projectUrlLabel: "Open GitHub Project",
+    liveUrl: "https://healthbuddyai.app/",
+    liveUrlLabel: "Open Website",
+  },
   "project-car-sales-revenue": {
     background:
       "Built an end-to-end machine learning workflow for an upper-level machine learning course using a 500K+ row vehicle-sales dataset, with emphasis on data cleaning, reproducible preprocessing, regression benchmarking, and deployable model packaging.",
@@ -240,8 +292,6 @@ const projectDetailsById = {
     frameworks: ["Flask", "SQLAlchemy", "SQLite", "Supabase PostgreSQL", "Flask-CORS", "REST API", "Unity WebGL", "Firebase Hosting"],
     projectUrl: "https://github.com/Vincent-Shin/SENG401_PROJECT_GAME_L02_GROUP06",
     projectUrlLabel: "Open GitHub Project",
-    liveUrl: "https://unemployed-simulator-web-test.web.app",
-    liveUrlLabel: "Play Web Build",
   },
   "project-movie-ticket-reservation-system": {
     background:
@@ -336,6 +386,8 @@ const projectDetailsById = {
 } as const;
 
 const projectMetaById = {
+  "project-smartcd-ai": "FinTech AI Product | April 2026 - July 2026",
+  "project-healthbuddy-ai": "HealthTech AI Backend | July 2026 - Present",
   "project-car-sales-revenue": "Machine Learning Project | December 2025",
   "project-weather-trend-forecasting-assessment": "Forecasting Assessment | April 2026",
   "project-macrofinder-system": "Full-stack Nutrition Platform | April 2026",
@@ -536,10 +588,10 @@ const resumeMetaByKey = {
   backend: {
     skillLines: [
       "Programming: Python, Java, JavaScript, C/C++",
-      "Backend Systems: Flask, REST APIs, Spring Boot, Kafka",
-      "Databases: MongoDB, MySQL, H2, SQLAlchemy, JPA",
-      "Tools: Docker, Git, Gradle, Linux",
-      "Concepts: workflow automation, process analysis, data pipelines, system debugging",
+      "Backend Systems: FastAPI, Flask, REST APIs, Pydantic, SQLAlchemy, Spring Boot",
+      "Databases: PostgreSQL/Supabase, MongoDB, SQLite, MySQL, H2",
+      "Tools: Docker, GitHub Actions, pytest, Alembic, Git, Linux",
+      "Concepts: API design, workflow automation, schema migration, validation, system debugging",
     ],
   },
   data: {
@@ -554,19 +606,19 @@ const resumeMetaByKey = {
   ai: {
     skillLines: [
       "Programming: Python, Java, JavaScript, C/C++",
-      "Data & Analytics: pandas, NumPy, scikit-learn, feature engineering, model evaluation",
-      "Backend Systems: Flask, REST APIs, MongoDB",
-      "Tools: Docker, Git, Linux, joblib",
-      "Concepts: machine learning workflows, preprocessing pipelines, deployment-ready inference",
+      "AI Systems: OpenAI Responses API, OpenRouter, LLM prompts, structured JSON validation, OCR",
+      "Backend Systems: FastAPI, Pydantic, Flask, REST APIs, SQLAlchemy",
+      "Tools: Docker, GitHub Actions, pytest, Alembic, joblib",
+      "Concepts: RAG-style grounding, human-review workflows, model fallback, deployment-ready inference",
     ],
   },
   software: {
     skillLines: [
       "Programming: Python, Java, JavaScript, C/C++",
-      "Software Systems: Flask, SQLAlchemy, JDBC, Servlets, REST APIs",
-      "Databases: MySQL, SQLite, H2, SQLAlchemy, JDBC",
-      "Tools: Docker, Git, Gradle, Jenkins, Selenium",
-      "Concepts: software architecture, object-oriented design, validation workflows, database-backed applications",
+      "Software Systems: React, Vite, FastAPI, Flask, SQLAlchemy, JDBC, REST APIs",
+      "Databases: Supabase, PostgreSQL, MongoDB, MySQL, SQLite",
+      "Tools: Docker, GitHub Actions, pytest, Vercel, Render, Git",
+      "Concepts: software architecture, product integration, validation workflows, database-backed applications",
     ],
   },
 };
@@ -612,24 +664,57 @@ const extrasByKey = {
   ],
 };
 
-const workExperience = {
-  role: "Server",
-  company: "Pho Pham Restaurant",
-  date: "Present",
-  bullets: [
-    "Coordinated high-volume service operations handling 100+ transactions per shift while maintaining accuracy and workflow efficiency.",
-    "Collaborated with team members to resolve operational issues in a fast-paced environment.",
-  ],
+const workExperienceByKey = {
+  backend: {
+    role: "Software Engineering Intern - HealthBuddy AI",
+    company: "The PM Accelerator",
+    date: "July 2026 - Present",
+    bullets: [
+      "Engineered backend AI extraction workflows using FastAPI, Pydantic, OpenRouter-compatible LLM APIs, and strict JSON validation to convert OCR medication text into reviewable structured data.",
+      "Built refill task APIs and service logic for caregiver medication workflows, enforcing duplicate prevention, status validation, pharmacy checks, and completion rules.",
+      "Added Alembic migrations and backend schema changes supporting medication review, refill task, and healthcare workflow evolution.",
+    ],
+  },
+  data: {
+    role: "Software Engineering Intern - SmartCD.ai",
+    company: "The PM Accelerator",
+    date: "April 2026 - July 2026",
+    bullets: [
+      "Engineered SmartCD.ai workflows across React, FastAPI, Supabase, and OpenAI APIs so users can compare CDs, brokered CDs, and Treasuries by after-tax return.",
+      "Built Bullet, Barbell, and Ladder strategy simulations with maturity filtering, allocation controls, blended after-tax APY, and compound-interest projections.",
+      "Hardened strategy-engine correctness through active-offer filtering, Bullet convergence fixes, and shared compound-interest validation across ranking and strategy modules.",
+    ],
+  },
+  ai: {
+    role: "Software Engineering Intern - HealthBuddy AI",
+    company: "The PM Accelerator",
+    date: "July 2026 - Present",
+    bullets: [
+      "Implemented medication extraction logic with OCR text, strict prompt templates, OpenRouter-compatible LLM APIs, JSON-only output requirements, Pydantic validation, and confidence labels.",
+      "Built medication draft and confirmation flows that normalize LLM-generated prescription fields before persistence, improving safety around AI-generated healthcare data.",
+      "Contributed to a domain-driven FastAPI healthtech backend with PostgreSQL/Supabase persistence, OCR/RAG-style processing, Telnyx call workflows, and human-review validation.",
+    ],
+  },
+  software: {
+    role: "Software Engineering Intern - SmartCD.ai",
+    company: "The PM Accelerator",
+    date: "April 2026 - July 2026",
+    bullets: [
+      "Built full-stack SmartCD.ai features across React, FastAPI, Supabase, and OpenAI APIs for tax-aware fixed-income product comparison.",
+      "Integrated strategy simulation workflows for Bullet, Barbell, and Ladder CD planning with responsive frontend controls and FastAPI backend endpoints.",
+      "Deployed and supported production-style workflows across Vercel, Render, environment-specific API configuration, health checks, pytest coverage, and GitHub Actions CI.",
+    ],
+  },
 };
 
 const inProgressProjects = [
-  "AI / NLP Risk Intelligence Project",
+  "HealthBuddy AI backend and AI healthcare workflows",
   "Quantitative Trading Capstone Project",
 ];
 
 const currentFocusItems = [
-  "Building practical AI/NLP systems for structured risk intelligence and document understanding.",
-  "Designing quant and fintech workflows that combine market data, signals, and disciplined risk management.",
+  "Building production-style AI backend workflows with FastAPI, LLM validation, OCR, and human-review safeguards.",
+  "Designing fintech and quant workflows that combine financial data, strategy simulation, and disciplined risk management.",
 ];
 
 const explorationAreas = [
@@ -640,6 +725,8 @@ const explorationAreas = [
 
 const projectDisplayOrder = [
   "project-portfolio-website-system",
+  "project-smartcd-ai",
+  "project-healthbuddy-ai",
   "project-macrofinder-system",
   "project-job-assistant-agent",
   "project-weather-trend-forecasting-assessment",
@@ -1133,7 +1220,7 @@ export default function App() {
     })),
     extrasTitle: "EXTRA-CURRICULARS",
     extras: extrasByKey[currentResume.key as keyof typeof extrasByKey],
-    work: workExperience,
+    work: workExperienceByKey[currentResume.key as keyof typeof workExperienceByKey],
   };
 
   const visibleLayerCount = Math.max(0, 3 - activeResume);
